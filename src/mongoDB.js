@@ -28,6 +28,9 @@ async function saveToMongoDB(data, collectionName) {
     await collection.insertMany(data);
     console.log('Data saved to MongoDB');
   }
+
+  // saveShopProducts
+  
   
 async function CheckMongoDB(data, collectionName) {
     const database = client.db('mydatabase');
@@ -46,7 +49,9 @@ async function CheckMongoDB(data, collectionName) {
         $set :{
             sourceId: item.SourceID,
             link: item.link,
-            shopId: item.shopId
+            shopId: item.shopId,
+            name: item.name,
+            createdAt: item.createdAt
         }
       };
   

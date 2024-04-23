@@ -51,12 +51,13 @@ async function TestWebScraping() {
       const TitleName = Product.querySelector('.description');
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
-      ProductList.push({ /*title,*/ name });
+      ProductList.push({ name });
     });
     return ProductList;
   });
 
-  const ShopProduct = await page.evaluate(function (shopId) { //for Each product -> pętla czy istnieje jesśli nie to...
+  const createdAt = new Date(); 
+  const ShopProduct = await page.evaluate(function (shopId, createdAt) { //for Each product -> pętla czy istnieje jesśli nie to...
     const ProductEvent = document.querySelectorAll('.product.large');
     const ProductList = [];
 
@@ -68,16 +69,36 @@ async function TestWebScraping() {
       const LinkName = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
       const link = LinkName ? LinkName.href : '-';
 
+      const TitleName = ShopProduct.querySelector('.description');
+      const name = TitleName ? TitleName.innerText.trim() : '-';
+
+     
+      console.log(createdAt)
+
       if (href) {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        ProductList.push({ link, SourceID, shopId });
+        ProductList.push({ link, SourceID, shopId, name, createdAt });
       }
     });
     return ProductList;
-  }, shopId);
+  }, shopId, createdAt);
 
+  const ProductPrice = await page.evaluate(function ( createdAt) { 
+    const ProductEvent = document.querySelectorAll('.product.large');
+    const ProductList = [];
+
+    ProductEvent.forEach(ProductPrice => {
+
+      const PriceName = ProductPrice.querySelector('.price');
+      const price = PriceName ? PriceName.innerText.trim() : '-';
+      
+      ProductList.push({ price, createdAt });
+      
+    });
+    return ProductList;
+  }, createdAt);
 
   const Shop = await page.evaluate(() => {
     const Shop = [];
@@ -86,8 +107,11 @@ async function TestWebScraping() {
     return Shop;
   });
 
+
   await CheckMongoDB(ShopProduct, 'ShopProduct');
   console.log(ShopProduct);
+  await sleep(7000);
+  await saveToMongoDB(ProductPrice, 'ProductPrice');
   //await saveToMongoDB(Item, 'OBI-Glebogryzarki');
   //console.log(Item);
   await sleep(10000);
@@ -95,8 +119,7 @@ async function TestWebScraping() {
   console.log(Product);
   await sleep(10000);
   await SaveName(Shop, 'Shops');
-  console.log(Shop);
-
+  console.log(Shop); 
 
   await browser.close();
 };
@@ -110,5 +133,28 @@ async function findShopByName(shopName) {
   }
   return shop;
 }
+/*
+async function MoveProductId(){
+  const database = client.db('mydatabase');
+  const productsCollection = database.collection("Products");
+  const ShopProductCollection = database.collection("ShopProduct");
+  const ShopProducts = await ShopProductCollection.find().toArray();
 
+  for(const ShopProduct of ShopProducts){
+    const ShopProductId = ShopProduct.link;
+    const products = await productsCollection.find().toArray();
+
+    for(const product of products){
+      if (ShopProductId.toLowerCase().includes(product.name.toLowerCase())){
+        await ShopProductId.updateOne(
+          { _id: ShopProduct._id},
+          {$set: {productId:product._id}}
+        );
+        console.log(productId);
+        break;
+      }
+    }
+  }
+}
+*/
 module.exports = { TestWebScraping, findShopByName }
