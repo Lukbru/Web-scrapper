@@ -89,12 +89,15 @@ async function TestWebScraping() {
     const ProductEvent = document.querySelectorAll('.product.large');
     const ProductList = [];
 
-    ProductEvent.forEach(ProductPrice => {
+    ProductEvent.forEach(ShopProduct => {
 
-      const PriceName = ProductPrice.querySelector('.price');
+      const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
+      const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
+
+      const PriceName = ShopProduct.querySelector('.price');
       const price = PriceName ? PriceName.innerText.trim() : '-';
       
-      ProductList.push({ price, createdAt });
+      ProductList.push({href, price, createdAt });
       
     });
     return ProductList;
@@ -133,28 +136,6 @@ async function findShopByName(shopName) {
   }
   return shop;
 }
-/*
-async function MoveProductId(){
-  const database = client.db('mydatabase');
-  const productsCollection = database.collection("Products");
-  const ShopProductCollection = database.collection("ShopProduct");
-  const ShopProducts = await ShopProductCollection.find().toArray();
 
-  for(const ShopProduct of ShopProducts){
-    const ShopProductId = ShopProduct.link;
-    const products = await productsCollection.find().toArray();
-
-    for(const product of products){
-      if (ShopProductId.toLowerCase().includes(product.name.toLowerCase())){
-        await ShopProductId.updateOne(
-          { _id: ShopProduct._id},
-          {$set: {productId:product._id}}
-        );
-        console.log(productId);
-        break;
-      }
-    }
-  }
-}
-*/
-module.exports = { TestWebScraping, findShopByName }
+module.exports = { TestWebScraping, findShopByName } 
+// Find server hosting -> to use Cron -> programe will start even when turned off
