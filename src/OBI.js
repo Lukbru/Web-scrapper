@@ -96,8 +96,13 @@ async function TestWebScraping() {
 
       const PriceName = ShopProduct.querySelector('.price');
       const price = PriceName ? PriceName.innerText.trim() : '-';
-      
-      ProductList.push({href, price, createdAt });
+
+    if (href) {
+      const part = href.split('/');
+      const SourceID = part[part.length - 1];
+
+      ProductList.push({SourceID, price, createdAt });
+    }
       
     });
     return ProductList;
@@ -114,7 +119,8 @@ async function TestWebScraping() {
   await CheckMongoDB(ShopProduct, 'ShopProduct');
   console.log(ShopProduct);
   await sleep(7000);
-  await saveToMongoDB(ProductPrice, 'ProductPrice');
+  await saveToMongoDB(ProductPrice, 'ShopProductPrice');
+  console.log(ProductPrice);
   //await saveToMongoDB(Item, 'OBI-Glebogryzarki');
   //console.log(Item);
   await sleep(10000);

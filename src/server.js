@@ -1,3 +1,5 @@
+const cors = require('cors');
+
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = "mongodb+srv://bruzdalukasz1c:evsPCoHvQN7TERdZ@scrap.mez5fky.mongodb.net/?retryWrites=true&w=majority&appName=Scrap";
 
@@ -5,16 +7,17 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const client = new MongoClient(uri, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    }
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
 });
 
 const app = express();
 const port = 3000;
 app.use(bodyParser.json());
+app.use(cors());
 
 
 client.connect().then(() => {
@@ -25,39 +28,55 @@ client.connect().then(() => {
   const productPrice_collection = db.collection('ProductPrice');
 
   app.get('/products', async (req, res) => {
-const products = await product_collection.find().toArray();
-res.json(products);
+    const products = await product_collection.find().toArray();
+    res.json(products);
   });
 
 
   app.get('/shopproduct', async (req, res) => {
-const shopProduct = await shopProduct_collection.find().toArray();
-res.json(shopProduct);
+    const shopProduct = await shopProduct_collection.find().toArray();
+    res.json(shopProduct);
   });
 
 
   // REST api ??? POCZYTAJ
+  app.put('/connect', async (req, res) => {
+    const { shopProductId, productId } = req.body;
 
-  app.put('/connect', async (req, res) => { // TODO renane ProductPrice to ShopProductPrice to be more meaningful
-const { shopProductId, productId } = req.body; 
-// TODO add validaiton if missing - throw 400
+    if (!shopProductId || !productId) {
+      return res.status(400).json({ error: 'shopProductId and productId must exist' });
+    }
 
-// TODO throw 400 if shop product id doesn't exist
-// TODO throw 400 if product id not found
+    const shopProduct = await shopProduct_collection.findOne({ _id: new ObjectId(shopProductId) });
+    if (!shopProduct) {
+      return res.status(400).json({ error: 'shopProduct Id doesnt exist ' })
+    }
 
-await shopProduct_collection.updateOne(
-  { _id: new ObjectId(shopProductId)},
-  {$set: { productId: new ObjectId(productId)}}
-   );
-res.send('Connected Product')
-   });
+    const product = await product_collection.findOne({ _id: new ObjectId(productId) });
+    if (!product) {
+      return res.status(400).json({ error: 'Product Id doesnt exist ' })
+    }
 
-  app.listen(port,() => {
-console.log('Server running on port: 3000')
+    const up_result = await shopProduct_collection.updateOne(
+      { _id: new ObjectId(shopProductId) },
+      { $set: { productId: new ObjectId(productId) } }
+    );
+
+    if (up_result.matchedCount === 0) {
+      return res.status(400).json({ error: 'Failed to connect ' })
+    }
+    res.json({
+      message: 'Connected collections together',
+      shopProductId: shopProductId,
+      productId: productId
+    });
   });
 
-
+  app.listen(port, () => {
+    console.log('Server running on port: 3000')
+  });
 });
+
 /*
 async function ConnectDatabase(){
   try{
@@ -103,8 +122,8 @@ async function FindProduct(productname){
     if (!shopProduct){
       console.log('Producnt not found.');
       return null;
-    } 
-    
+    }
+
     const shop = await shops_collection.findOne({ _id: shopProduct.shopId});
 
     const productPrice = await productPrice_collection.find({link: shopProduct.link}).toArray();
