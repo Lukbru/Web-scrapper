@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://bruzdalukasz1c:evsPCoHvQN7TERdZ@scrap.mez5fky.mongodb.net/?retryWrites=true&w=majority&appName=Scrap";
-const { saveToMongoDB, CheckMongoDB, sleep, SaveName, SaveProductPrice, UpdateShopProduct } = require('./mongoDB.js');
+const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct } = require('./mongoDB.js');
 
 
 const client = new MongoClient(uri, {
@@ -61,7 +61,7 @@ async function TestWebScraping() {
     const ProductEvent = document.querySelectorAll('.product.large');
     const ProductList = [];
 
-    ProductEvent.forEach(ShopProduct => {
+    ProductEvent.forEach(async (ShopProduct) => {
 
       const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
       const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
@@ -72,6 +72,9 @@ async function TestWebScraping() {
       const TitleName = ShopProduct.querySelector('.description');
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
+      const PriceName = ShopProduct.querySelector('.price');
+      const price = PriceName ? PriceName.innerText.trim() : '-';
+
      
       console.log(createdAt)
 
@@ -79,36 +82,45 @@ async function TestWebScraping() {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        // TODO save to mongo, it should return id
-        // TODO then get price and save it with given shopProductId
-        ProductList.push({ link, SourceID, shopId, name, createdAt });
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price, createdAt}});
+
       }
     });
     return ProductList;
   }, shopId, createdAt);
 
-  const ProductPrice = await page.evaluate(function ( createdAt) { 
-    const ProductEvent = document.querySelectorAll('.product.large');
-    const ProductList = [];
-
-    ProductEvent.forEach(ShopProduct => {
-
-      const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
-      const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
-
-      const PriceName = ShopProduct.querySelector('.price');
-      const price = PriceName ? PriceName.innerText.trim() : '-';
-
-    if (href) {
-      const part = href.split('/');
-      const SourceID = part[part.length - 1];
-
-      ProductList.push({SourceID, price, createdAt });
-    }
-      
+  await Promise.all(ShopProduct.map( async(data) => {
+    const shopProductId = await upsertShopProduct(data.product);
+    await savePrice({
+      price: data.price.price,
+      shopProductId: shopProductId,
+      createdAt: data.price.createdAt
     });
-    return ProductList;
-  }, createdAt);
+  }))
+
+
+  // const ProductPrice = await page.evaluate(function ( createdAt) { 
+  //   const ProductEvent = document.querySelectorAll('.product.large');
+  //   const ProductList = [];
+
+  //   ProductEvent.forEach(ShopProduct => {
+
+  //     const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
+  //     const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
+
+  //     const PriceName = ShopProduct.querySelector('.price');
+  //     const price = PriceName ? PriceName.innerText.trim() : '-';
+
+  //   if (href) {
+  //     const part = href.split('/');
+  //     const SourceID = part[part.length - 1];
+
+  //     ProductList.push({SourceID, price, createdAt });
+  //   }
+      
+  //   });
+  //   return ProductList;
+  // }, createdAt);
 
   const Shop = await page.evaluate(() => {
     const Shop = [];
@@ -118,11 +130,11 @@ async function TestWebScraping() {
   });
 
 
-  await CheckMongoDB(ShopProduct, 'ShopProduct');
-  console.log(ShopProduct);
-  await sleep(7000);
-  await saveToMongoDB(ProductPrice, 'ShopProductPrice');
-  console.log(ProductPrice);
+//  await CheckMongoDB(ShopProduct, 'ShopProduct');
+ // console.log(ShopProduct);
+ // await sleep(7000);
+ // await saveToMongoDB(ProductPrice, 'ShopProductPrice');
+ // console.log(ProductPrice);
   //await saveToMongoDB(Item, 'OBI-Glebogryzarki');
   //console.log(Item);
   await sleep(10000);
