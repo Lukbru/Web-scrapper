@@ -74,8 +74,7 @@ async function TestWebScraping() {
 
       const PriceName = ShopProduct.querySelector('.price');
       const price = PriceName ? PriceName.innerText.trim() : '-';
-
-     
+    
       console.log(createdAt)
 
       if (href) {
@@ -98,30 +97,6 @@ async function TestWebScraping() {
     });
   }))
 
-
-  // const ProductPrice = await page.evaluate(function ( createdAt) { 
-  //   const ProductEvent = document.querySelectorAll('.product.large');
-  //   const ProductList = [];
-
-  //   ProductEvent.forEach(ShopProduct => {
-
-  //     const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
-  //     const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
-
-  //     const PriceName = ShopProduct.querySelector('.price');
-  //     const price = PriceName ? PriceName.innerText.trim() : '-';
-
-  //   if (href) {
-  //     const part = href.split('/');
-  //     const SourceID = part[part.length - 1];
-
-  //     ProductList.push({SourceID, price, createdAt });
-  //   }
-      
-  //   });
-  //   return ProductList;
-  // }, createdAt);
-
   const Shop = await page.evaluate(() => {
     const Shop = [];
     const name = 'OBI';
@@ -130,13 +105,7 @@ async function TestWebScraping() {
   });
 
 
-//  await CheckMongoDB(ShopProduct, 'ShopProduct');
- // console.log(ShopProduct);
- // await sleep(7000);
- // await saveToMongoDB(ProductPrice, 'ShopProductPrice');
- // console.log(ProductPrice);
-  //await saveToMongoDB(Item, 'OBI-Glebogryzarki');
-  //console.log(Item);
+  console.log(ShopProduct);
   await sleep(10000);
   await SaveName(Product, 'Products');
   console.log(Product);
@@ -174,7 +143,7 @@ async function OBiRozbierzaczeGalezi() {
     const ProductEvent = document.querySelectorAll('.product.large');
     const ProductList = [];
 
-    ProductEvent.forEach(ShopProduct => {
+    ProductEvent.forEach(async (ShopProduct) => {
 
       const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
       const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
@@ -185,6 +154,9 @@ async function OBiRozbierzaczeGalezi() {
       const TitleName = ShopProduct.querySelector('.description');
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
+      const PriceName = ShopProduct.querySelector('.price');
+      const price = PriceName ? PriceName.innerText.trim() : '-';
+
      
       console.log(createdAt)
 
@@ -192,34 +164,21 @@ async function OBiRozbierzaczeGalezi() {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        ProductList.push({ link, SourceID, shopId, name, createdAt });
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price, createdAt}});
+
       }
     });
     return ProductList;
   }, shopId, createdAt);
 
-  const ProductPrice = await page.evaluate(function ( createdAt) { 
-    const ProductEvent = document.querySelectorAll('.product.large');
-    const ProductList = [];
-
-    ProductEvent.forEach(ShopProduct => {
-
-      const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
-      const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
-
-      const PriceName = ShopProduct.querySelector('.price');
-      const price = PriceName ? PriceName.innerText.trim() : '-';
-
-    if (href) {
-      const part = href.split('/');
-      const SourceID = part[part.length - 1];
-
-      ProductList.push({SourceID, price, createdAt });
-    }
-      
+  await Promise.all(ShopProduct.map( async(data) => {
+    const shopProductId = await upsertShopProduct(data.product);
+    await savePrice({
+      price: data.price.price,
+      shopProductId: shopProductId,
+      createdAt: data.price.createdAt
     });
-    return ProductList;
-  }, createdAt);
+  }))
 
   const Shop = await page.evaluate(() => {
     const Shop = [];
@@ -228,13 +187,10 @@ async function OBiRozbierzaczeGalezi() {
     return Shop;
   });
 
-  //await CheckMongoDB(ShopProduct, 'ShopProduct');
+  
   console.log(ShopProduct);
   await sleep(7000);
-  //await saveToMongoDB(ProductPrice, 'ShopProductPrice');
-  console.log(ProductPrice);
-  await sleep(10000);
-  //await SaveName(Product, 'Products');
+  await SaveName(Product, 'Products');
   console.log(Product);
   await sleep(10000);
   await SaveName(Shop, 'Shops');
@@ -271,7 +227,7 @@ async function OBiNozyceZywoplotu() {
     const ProductEvent = document.querySelectorAll('.product.large');
     const ProductList = [];
 
-    ProductEvent.forEach(ShopProduct => {
+    ProductEvent.forEach(async (ShopProduct) => {
 
       const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
       const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
@@ -282,6 +238,9 @@ async function OBiNozyceZywoplotu() {
       const TitleName = ShopProduct.querySelector('.description');
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
+      const PriceName = ShopProduct.querySelector('.price');
+      const price = PriceName ? PriceName.innerText.trim() : '-';
+
      
       console.log(createdAt)
 
@@ -289,34 +248,21 @@ async function OBiNozyceZywoplotu() {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        ProductList.push({ link, SourceID, shopId, name, createdAt });
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price, createdAt}});
+
       }
     });
     return ProductList;
   }, shopId, createdAt);
 
-  const ProductPrice = await page.evaluate(function ( createdAt) { 
-    const ProductEvent = document.querySelectorAll('.product.large');
-    const ProductList = [];
-
-    ProductEvent.forEach(ShopProduct => {
-
-      const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
-      const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
-
-      const PriceName = ShopProduct.querySelector('.price');
-      const price = PriceName ? PriceName.innerText.trim() : '-';
-
-    if (href) {
-      const part = href.split('/');
-      const SourceID = part[part.length - 1];
-
-      ProductList.push({SourceID, price, createdAt });
-    }
-      
+  await Promise.all(ShopProduct.map( async(data) => {
+    const shopProductId = await upsertShopProduct(data.product);
+    await savePrice({
+      price: data.price.price,
+      shopProductId: shopProductId,
+      createdAt: data.price.createdAt
     });
-    return ProductList;
-  }, createdAt);
+  }))
 
   const Shop = await page.evaluate(() => {
     const Shop = [];
@@ -325,13 +271,9 @@ async function OBiNozyceZywoplotu() {
     return Shop;
   });
 
-  //await CheckMongoDB(ShopProduct, 'ShopProduct');
   console.log(ShopProduct);
   await sleep(7000);
-  //await saveToMongoDB(ProductPrice, 'ShopProductPrice');
-  console.log(ProductPrice);
-  await sleep(10000);
-  //await SaveName(Product, 'Products');
+  await SaveName(Product, 'Products');
   console.log(Product);
   await sleep(10000);
   await SaveName(Shop, 'Shops');
@@ -341,6 +283,171 @@ async function OBiNozyceZywoplotu() {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
+
+async function OBItelefonyp1() {
+  const browser = await puppeteer.launch();   //({ headless : false }) - pokazuje nam  ze otwiera przegladarke
+  const page = await browser.newPage();
+  await page.goto('https://www.obi.pl/elektronika-i-zabezpieczenie-domu/telefony/c/985');
+  const shop = await findShopByName("OBI");
+  const shopId = shop._id.toString();
+
+  const Product = await page.evaluate(function () {
+    const ProductEvent = document.querySelectorAll('.product.large');
+    const ProductList = [];
+
+    ProductEvent.forEach(Product => {
+
+      const TitleName = Product.querySelector('.description');
+      const name = TitleName ? TitleName.innerText.trim() : '-';
+
+      ProductList.push({ name });
+    });
+    return ProductList;
+  });
+
+  const createdAt = new Date(); 
+  const ShopProduct = await page.evaluate(function (shopId, createdAt) { //for Each product -> pętla czy istnieje jesśli nie to...
+    const ProductEvent = document.querySelectorAll('.product.large');
+    const ProductList = [];
+
+    ProductEvent.forEach(async (ShopProduct) => {
+
+      const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
+      const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
+
+      const LinkName = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
+      const link = LinkName ? LinkName.href : '-';
+
+      const TitleName = ShopProduct.querySelector('.description');
+      const name = TitleName ? TitleName.innerText.trim() : '-';
+
+      const PriceName = ShopProduct.querySelector('.price');
+      const price = PriceName ? PriceName.innerText.trim() : '-';
+
+     
+      console.log(createdAt)
+
+      if (href) {
+        const part = href.split('/');
+        const SourceID = part[part.length - 1];
+
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price, createdAt}});
+
+      }
+    });
+    return ProductList;
+  }, shopId, createdAt);
+
+  await Promise.all(ShopProduct.map( async(data) => {
+    const shopProductId = await upsertShopProduct(data.product);
+    await savePrice({
+      price: data.price.price,
+      shopProductId: shopProductId,
+      createdAt: data.price.createdAt
+    });
+  }))
+
+  const Shop = await page.evaluate(() => {
+    const Shop = [];
+    const name = 'OBI';
+    Shop.push({ name });
+    return Shop;
+  });
+
+  console.log(ShopProduct);
+  await sleep(7000);
+  await SaveName(Product, 'Products');
+  console.log(Product);
+  await sleep(10000);
+  await SaveName(Shop, 'Shops');
+  console.log(Shop); 
+
+  await browser.close();
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+async function OBItelefonyp2() {
+  const browser = await puppeteer.launch();   //({ headless : false }) - pokazuje nam  ze otwiera przegladarke
+  const page = await browser.newPage();
+  await page.goto('https://www.obi.pl/elektronika-i-zabezpieczenie-domu/telefony/c/985?page=2');
+  const shop = await findShopByName("OBI");
+  const shopId = shop._id.toString();
+
+  const Product = await page.evaluate(function () {
+    const ProductEvent = document.querySelectorAll('.product.large');
+    const ProductList = [];
+
+    ProductEvent.forEach(Product => {
+
+      const TitleName = Product.querySelector('.description');
+      const name = TitleName ? TitleName.innerText.trim() : '-';
+
+      ProductList.push({ name });
+    });
+    return ProductList;
+  });
+
+  const createdAt = new Date(); 
+  const ShopProduct = await page.evaluate(function (shopId, createdAt) { //for Each product -> pętla czy istnieje jesśli nie to...
+    const ProductEvent = document.querySelectorAll('.product.large');
+    const ProductList = [];
+
+    ProductEvent.forEach(async (ShopProduct) => {
+
+      const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
+      const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
+
+      const LinkName = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
+      const link = LinkName ? LinkName.href : '-';
+
+      const TitleName = ShopProduct.querySelector('.description');
+      const name = TitleName ? TitleName.innerText.trim() : '-';
+
+      const PriceName = ShopProduct.querySelector('.price');
+      const price = PriceName ? PriceName.innerText.trim() : '-';
+
+     
+      console.log(createdAt)
+
+      if (href) {
+        const part = href.split('/');
+        const SourceID = part[part.length - 1];
+
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price, createdAt}});
+
+      }
+    });
+    return ProductList;
+  }, shopId, createdAt);
+
+  await Promise.all(ShopProduct.map( async(data) => {
+    const shopProductId = await upsertShopProduct(data.product);
+    await savePrice({
+      price: data.price.price,
+      shopProductId: shopProductId,
+      createdAt: data.price.createdAt
+    });
+  }))
+
+  const Shop = await page.evaluate(() => {
+    const Shop = [];
+    const name = 'OBI';
+    Shop.push({ name });
+    return Shop;
+  });
+
+  console.log(ShopProduct);
+  await sleep(7000);
+  await SaveName(Product, 'Products');
+  console.log(Product);
+  await sleep(10000);
+  await SaveName(Shop, 'Shops');
+  console.log(Shop); 
+
+  await browser.close();
+};
 
 async function findShopByName(shopName) {
   const database = client.db('mydatabase');
@@ -352,4 +459,4 @@ async function findShopByName(shopName) {
   return shop;
 }
 
-module.exports = { TestWebScraping, findShopByName,OBiRozbierzaczeGalezi,OBiNozyceZywoplotu } 
+module.exports = { TestWebScraping, findShopByName,OBiRozbierzaczeGalezi,OBiNozyceZywoplotu,OBItelefonyp1,OBItelefonyp2 } 

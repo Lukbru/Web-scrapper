@@ -39,7 +39,6 @@ client.connect().then(() => {
   });
 
 
-  // REST api ??? POCZYTAJ
   app.put('/connect', async (req, res) => {
     const { shopProductId, productId } = req.body;
 
