@@ -5,15 +5,33 @@ import ShopProduct from './ShopProduct';
 import ConnectProducts from './ConnectProducts';
 
 function App() {
+  const navbar={
+    position: 'fixed',
+    top: 0,
+    width: '100%',
+    backgroundColor: 'grey',
+  };
+  const linkboxes={
+    display: 'inline-block',
+    padding: '10px',
+    color: 'white',
+    textDecoration: 'none',
+  }
+  const menuboxes={
+    display: 'inline',
+  }
+
   return (
     <Router>
     <div className="App">
-      <li>
-        <Link to = './ShopProduct'>ShopProduct</Link>
+      <nav style={navbar}>
+      <li style={menuboxes}>
+        <Link to = './ShopProduct' style={linkboxes}>ShopProduct</Link>
       </li>
-      <li>
-        <Link to = './'>Product</Link>
+      <li style={menuboxes}>
+        <Link to = './' style={linkboxes}>Product</Link>
       </li>
+      </nav>
 
       ---------------
 

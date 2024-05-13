@@ -98,6 +98,37 @@ async function SaveName(data, collectionName) {
   }
 }
 
+async function SaveProduct(data, collectionName) {
+  const database = client.db('mydatabase');
+  const collection = database.collection(collectionName);
+  const options = { upsert: true };
+
+  for (const item of data) {
+    try {
+      const log = {
+        $or: [
+          { name: item.name },
+        ]
+      };
+      const update = {
+        $set: {
+          name: item.name,
+          categoryId: item.categoryId
+        }
+      };
+
+      const collectionA = await collection.updateOne(log, update, options);
+      if (collectionA.upsertedCount > 0) {
+        console.log('Data updated to MongoDB');
+      } else {
+        console.log('Data already exist in MongoDB');
+      }
+    }
+    catch (error) {
+      console.error('Error - please try again later ?');
+    }
+  }
+}
 
 async function savePrice(data) {
   const database = client.db('mydatabase');
@@ -143,4 +174,4 @@ async function upsertShopProduct(product) {
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms)); // Czeka dany czas
 }
-module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection, savePrice, upsertShopProduct }
+module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct }

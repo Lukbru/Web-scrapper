@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://bruzdalukasz1c:evsPCoHvQN7TERdZ@scrap.mez5fky.mongodb.net/?retryWrites=true&w=majority&appName=Scrap";
-const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct } = require('./mongoDB.js');
+const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct } = require('./mongoDB.js');
 
 
 const client = new MongoClient(uri, {
@@ -16,9 +16,14 @@ const client = new MongoClient(uri, {
 async function TestWebScraping() {
   const browser = await puppeteer.launch();   //({ headless : false }) - pokazuje nam  ze otwiera przegladarke
   const page = await browser.newPage();
+
   await page.goto('https://www.obi.pl/maszyny-ogrodnicze/glebogryzarki/c/1402');
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
+
+  const category = await findCategoryByName("Glebogryzarki");
+  const categoryId = category._id.toString();
+
 
   const Item = await page.evaluate(function () {
     const ItemEvent = document.querySelectorAll('.product.large');
@@ -42,7 +47,7 @@ async function TestWebScraping() {
     return ItemList;
   });
 
-  const Product = await page.evaluate(function () {
+  const Product = await page.evaluate(function (categoryId) {
     const ProductEvent = document.querySelectorAll('.product.large');
     const ProductList = [];
 
@@ -51,10 +56,10 @@ async function TestWebScraping() {
       const TitleName = Product.querySelector('.description');
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
-      ProductList.push({ name });
+      ProductList.push({ name, categoryId });
     });
     return ProductList;
-  });
+  },categoryId);
 
   const createdAt = new Date(); 
   const ShopProduct = await page.evaluate(function (shopId, createdAt) { //for Each product -> pętla czy istnieje jesśli nie to...
@@ -104,10 +109,19 @@ async function TestWebScraping() {
     return Shop;
   });
 
+  const Category = await page.evaluate(() => {
+    const Category = [];
+    const name = 'Glebogryzarki';
+    Category.push({ name });
+    return Category;
+  });
 
+  await SaveName(Category, 'Categories');
+  console.log(Category); 
+  await sleep(10000);
   console.log(ShopProduct);
   await sleep(10000);
-  await SaveName(Product, 'Products');
+  await SaveProduct(Product, 'Products');
   console.log(Product);
   await sleep(10000);
   await SaveName(Shop, 'Shops');
@@ -459,4 +473,14 @@ async function findShopByName(shopName) {
   return shop;
 }
 
-module.exports = { TestWebScraping, findShopByName,OBiRozbierzaczeGalezi,OBiNozyceZywoplotu,OBItelefonyp1,OBItelefonyp2 } 
+async function findCategoryByName(categoryName) {
+  const database = client.db('mydatabase');
+  const categoryCollection = database.collection("Categories");
+  const category = await categoryCollection.findOne({ name: categoryName });
+  if (!category) {
+    throw new Error("Category not found.");
+  }
+  return category;
+}
+
+module.exports = { TestWebScraping, findShopByName,OBiRozbierzaczeGalezi,OBiNozyceZywoplotu,OBItelefonyp1,OBItelefonyp2,findCategoryByName } 
