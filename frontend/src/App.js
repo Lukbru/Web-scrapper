@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom';
 import Product from './Product';
 import ShopProduct from './ShopProduct';
 import ConnectProducts from './ConnectProducts';
+import ProductDetail from './ProductDetail';
 
 function App() {
   const navbar={
@@ -36,6 +37,8 @@ function App() {
       ---------------
 
       <Routes>
+        <Route path="/products/:productId" element={<ProductDetail />} />
+
         <Route path="/products" element={<Product />} />
 
         <Route path="/shopproduct" element={<ShopProduct />} />

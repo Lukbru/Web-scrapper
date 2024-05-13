@@ -1,20 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
-function displayProducts(products, loading, error) {
-    if (loading || error) {
-        return;
-    }
-    return (
-        <ul>
-            {products.map((product) => 
-                <li key={product._id}>
-                    <h2>{product.name}</h2>
-                </li>
-            )}
-        </ul>
-    )
-}
+import { Link } from 'react-router-dom';
 
 function Product() {
     const [products, setProducts] = useState([]);
@@ -22,7 +8,7 @@ function Product() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [SelectCategory, setSelectCategory] = useState('All');
-    const [category, setCategory] = useState([]);
+    const [category, setCategory] = useState([]); //TODO w react w boxie - obrazek i opis/link
 
     const fetchCategories = async () => {
         try {
@@ -90,13 +76,15 @@ function Product() {
             {loading && <p>Loading</p>}
             {error && <p>{error}</p>}
             <ul>
-                {sortProduct.map((products)=>{
+                {sortProduct.map((products)=>(
                     <li key={products._id}>
                         <h2>{products.name}</h2>
+                        <button>
+                        <Link to={`/products/${products._id}`}>Product details</Link>
+                        </button>
                     </li>
-                })}
+                ))}
             </ul>
-            {displayProducts(sortProduct, loading, error)}
         </div>
     );
 }
