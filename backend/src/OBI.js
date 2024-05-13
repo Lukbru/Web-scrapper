@@ -119,7 +119,11 @@ async function TestWebScraping() {
   await SaveName(Category, 'Categories');
   console.log(Category); 
   await sleep(10000);
-  console.log(ShopProduct);
+  await CheckMongoDB(ShopProduct, 'ShopProduct');
+ console.log(ShopProduct);
+ await sleep(7000);
+ await saveToMongoDB(ProductPrice, 'ShopProductPrice');
+ console.log(ProductPrice);
   await sleep(10000);
   await SaveProduct(Product, 'Products');
   console.log(Product);
@@ -138,7 +142,10 @@ async function OBiRozbierzaczeGalezi() {
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
 
-  const Product = await page.evaluate(function () {
+  const category = await findCategoryByName("Rozdrabniacze-do-galezi");
+  const categoryId = category._id.toString();
+
+  const Product = await page.evaluate(function (categoryId) {
     const ProductEvent = document.querySelectorAll('.product.large');
     const ProductList = [];
 
@@ -147,10 +154,10 @@ async function OBiRozbierzaczeGalezi() {
       const TitleName = Product.querySelector('.description');
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
-      ProductList.push({ name });
+      ProductList.push({ name, categoryId });
     });
     return ProductList;
-  });
+  },categoryId);
 
   const createdAt = new Date(); 
   const ShopProduct = await page.evaluate(function (shopId, createdAt) { //for Each product -> pętla czy istnieje jesśli nie to...
@@ -201,10 +208,20 @@ async function OBiRozbierzaczeGalezi() {
     return Shop;
   });
 
+  const Category = await page.evaluate(() => {
+    const Category = [];
+    const name = 'Rozdrabniacze-do-galezi';
+    Category.push({ name });
+    return Category;
+  });
   
+
+  await SaveName(Category, 'Categories');
+  console.log(Category); 
+  await sleep(10000);
   console.log(ShopProduct);
   await sleep(7000);
-  await SaveName(Product, 'Products');
+  await SaveProduct(Product, 'Products');
   console.log(Product);
   await sleep(10000);
   await SaveName(Shop, 'Shops');
