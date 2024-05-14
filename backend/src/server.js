@@ -26,7 +26,15 @@ client.connect().then(() => {
   const category_collection = db.collection('Categories');
   const shops_collection = db.collection('Shops');
   const shopProduct_collection = db.collection('ShopProduct');
-  const productPrice_collection = db.collection('ProductPrice');
+  const productPrice_collection = db.collection('ShopProductPrice');
+
+  app.get('/shops', async (req, res) => {
+    const shops = await shops_collection.find().toArray();
+    res.json(shops.map(shop => ({ 
+      id: shop._id.toString(),
+      name: shop.name
+    })));
+  });
 
   app.get('/products', async (req, res) => {
     const products = await product_collection.find().toArray();
@@ -76,6 +84,48 @@ client.connect().then(() => {
     const categories = await category_collection.find().toArray();
     res.json(categories);
   });
+
+   app.get('/products/:productId', async (req, res)=> {
+    const {productId} = req.params;
+    const product = await product_collection.findOne({ _id: new ObjectId(productId) });
+    if (!product){
+      return res.status(400).json({ error: 'Failed to find product ' })
+    }
+
+    const shopProducts = await shopProduct_collection.find({productId: product._id}).toArray();
+    if (!shopProducts){
+      return res.status(400).json({ error: 'Failed to load shop products' })
+    }
+
+    const shopsProductPricesData = await Promise.all(
+      shopProducts.map(async shopProduct => 
+        {
+          const pricesData = await productPrice_collection.find({shopProductId: shopProduct._id.toString()}, { sort: { createdAt: 1 }, projection: { price: 1, createdAt: 1}}).toArray()
+          return {
+            shopProductId: shopProduct._id.toString(),
+            pricesData: pricesData.map(data => ({ price: data.price, createdAt: data.createdAt}))
+          }
+        }
+      )
+    );
+
+    const groupedShopsProductPrices = shopsProductPricesData.reduce((acc, element) => {
+      acc[element.shopProductId] = element.pricesData;
+      return acc;
+    }, {});
+
+    res.json({
+      name: product.name,
+      shopProducts: shopProducts.map(shopProduct => ({
+        id: shopProduct._id.toString(),
+        shopId: shopProduct.shopId,
+        name: shopProduct.name,
+        link: shopProduct.link,
+        prices: groupedShopsProductPrices[shopProduct._id.toString()] 
+      }))
+    });
+   });
+   
  
   app.listen(port, () => {
     console.log('Server running on port: 3000')

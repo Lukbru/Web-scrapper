@@ -122,9 +122,6 @@ async function TestWebScraping() {
   await CheckMongoDB(ShopProduct, 'ShopProduct');
  console.log(ShopProduct);
  await sleep(7000);
- await saveToMongoDB(ProductPrice, 'ShopProductPrice');
- console.log(ProductPrice);
-  await sleep(10000);
   await SaveProduct(Product, 'Products');
   console.log(Product);
   await sleep(10000);
@@ -219,8 +216,9 @@ async function OBiRozbierzaczeGalezi() {
   await SaveName(Category, 'Categories');
   console.log(Category); 
   await sleep(10000);
-  console.log(ShopProduct);
-  await sleep(7000);
+  await CheckMongoDB(ShopProduct, 'ShopProduct');
+ console.log(ShopProduct);
+ await sleep(7000);
   await SaveProduct(Product, 'Products');
   console.log(Product);
   await sleep(10000);
@@ -302,9 +300,13 @@ async function OBiNozyceZywoplotu() {
     return Shop;
   });
 
-  console.log(ShopProduct);
-  await sleep(7000);
-  await SaveName(Product, 'Products');
+  // await SaveName(Category, 'Categories');
+  // console.log(Category); 
+  // await sleep(10000);
+  await CheckMongoDB(ShopProduct, 'ShopProduct');
+ console.log(ShopProduct);
+ await sleep(7000);
+  await SaveProduct(Product, 'Products');
   console.log(Product);
   await sleep(10000);
   await SaveName(Shop, 'Shops');
@@ -385,9 +387,13 @@ async function OBItelefonyp1() {
     return Shop;
   });
 
-  console.log(ShopProduct);
-  await sleep(7000);
-  await SaveName(Product, 'Products');
+  // await SaveName(Category, 'Categories');
+  // console.log(Category); 
+  // await sleep(10000);
+  await CheckMongoDB(ShopProduct, 'ShopProduct');
+ console.log(ShopProduct);
+ await sleep(7000);
+  await SaveProduct(Product, 'Products');
   console.log(Product);
   await sleep(10000);
   await SaveName(Shop, 'Shops');
@@ -469,9 +475,13 @@ async function OBItelefonyp2() {
     return Shop;
   });
 
-  console.log(ShopProduct);
-  await sleep(7000);
-  await SaveName(Product, 'Products');
+  // await SaveName(Category, 'Categories');
+  // console.log(Category); 
+  // await sleep(10000);
+  await CheckMongoDB(ShopProduct, 'ShopProduct');
+ console.log(ShopProduct);
+ await sleep(7000);
+  await SaveProduct(Product, 'Products');
   console.log(Product);
   await sleep(10000);
   await SaveName(Shop, 'Shops');

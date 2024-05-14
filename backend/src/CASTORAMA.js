@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://bruzdalukasz1c:evsPCoHvQN7TERdZ@scrap.mez5fky.mongodb.net/?retryWrites=true&w=majority&appName=Scrap";
-const {saveToMongoDB, CheckMongoDB, sleep, SaveName,savePrice, upsertShopProduct} = require('./mongoDB.js');
+const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct } = require('./mongoDB.js');
 
 
 const client = new MongoClient(uri, {
@@ -18,8 +18,11 @@ async function TestWebScraping2 () {
      await page.goto('https://www.castorama.pl/search?term=glebogryzarki');
      const shop = await findShopByName("Castorama");
     const shopId = shop._id.toString();
+    
+  const category = await findCategoryByName("Glebogryzarki");
+  const categoryId = category._id.toString();
   
-    const Product = await page.evaluate(function () {
+    const Product = await page.evaluate(function (categoryId) {
       const ProductEvent = document.querySelectorAll('.b9bdc658');
       const ProductList = [];
   
@@ -28,10 +31,10 @@ async function TestWebScraping2 () {
         const TitleName = Product.querySelector('.ccb9d67a');
         const name = TitleName ? TitleName.innerText.trim() : '-';
   
-        ProductList.push({ name });
+        ProductList.push({ name, categoryId });
       });
       return ProductList;
-    });
+    },categoryId);
   
     const createdAt = new Date(); 
     const ShopProduct = await page.evaluate(function (shopId, createdAt) { //for Each product -> pętla czy istnieje jesśli nie to...
@@ -83,10 +86,21 @@ async function TestWebScraping2 () {
       Shop.push({ name });
       return Shop;
     });
+
+    const Category = await page.evaluate(() => {
+      const Category = [];
+      const name = 'Glebogryzarki';
+      Category.push({ name });
+      return Category;
+    });
   
-    console.log(ShopProduct);
-    await sleep(7000);
-    await SaveName(Product, 'Products');
+    await SaveName(Category, 'Categories');
+    console.log(Category); 
+    await sleep(10000);
+    await CheckMongoDB(ShopProduct, 'ShopProduct');
+   console.log(ShopProduct);
+   await sleep(7000);
+    await SaveProduct(Product, 'Products');
     console.log(Product);
     await sleep(10000);
     await SaveName(Shop, 'Shops');
@@ -167,9 +181,13 @@ async function TestWebScraping2 () {
       return Shop;
     });
   
-    console.log(ShopProduct);
-    await sleep(7000);
-    await SaveName(Product, 'Products');
+    // await SaveName(Category, 'Categories');
+    // console.log(Category); 
+    await sleep(10000);
+    await CheckMongoDB(ShopProduct, 'ShopProduct');
+   console.log(ShopProduct);
+   await sleep(7000);
+    await SaveProduct(Product, 'Products');
     console.log(Product);
     await sleep(10000);
     await SaveName(Shop, 'Shops');
@@ -187,6 +205,16 @@ async function findShopByName(shopName) {
       throw new Error("Shop not found.");
     }
     return shop;
+  }
+
+  async function findCategoryByName(categoryName) {
+    const database = client.db('mydatabase');
+    const categoryCollection = database.collection("Categories");
+    const category = await categoryCollection.findOne({ name: categoryName });
+    if (!category) {
+      throw new Error("Category not found.");
+    }
+    return category;
   }
 
 module.exports={TestWebScraping2,CastoramaRozbierzaczeGalezi}
