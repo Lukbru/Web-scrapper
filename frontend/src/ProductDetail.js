@@ -1,6 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    TimeSeriesScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+  } from 'chart.js';
+  import { Line } from 'react-chartjs-2'; 
+  import { Chart } from 'chart.js';
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    TimeSeriesScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+  );
 
 function ProductDetail(){
     const { productId } = useParams();
@@ -39,34 +63,33 @@ function ProductDetail(){
             return;
         }
 
-
+        const datasets  = product.shopProducts.map(shopProduct=>{
+            return {
+                label:shops[shopProduct.shopId],
+                data: shopProduct.prices.map(priceData=> ({
+                    x: new Date(priceData.createdAt),
+                    y: priceData.price
+                })),
+                borderColor: RandomColor()
+            }});
         
-        return (<div>
-            Shops
-            
-            <ul>
-            {product.shopProducts.map(shopProduct => {
-                return (<li>
-                    {shops[shopProduct.shopId]}
-                    
-                    <p>
-                     Current Price {shopProduct.prices.at(-1).price}
-                    </p>
+        const labels= [...new Set(product.shopProducts.flatMap(shopProduct=>shopProduct.prices.map(priceData=>new Date(priceData.createdAt).toLocaleDateString())))];
 
-                    <div>
-                        Price History
-
-                        {shopProduct.prices.map(priceData => {
-                            return <p>
-                                {`Date ${priceData.createdAt}, Price ${priceData.price}`}
-                            </p>
-                        })}
-                    </div>
-                </li>)
-            })}
-            </ul>
-        </div>)
-    }
+  return (
+    <div>Shops
+        <div style={{width: "80%", display: 'flex', justifyContent: 'center'}}>
+                <Line data={{
+                     labels,
+                     datasets 
+                     }}  
+                 options={{
+                responsive: true,
+                   }}
+              />
+          </div>
+        </div>
+    );
+}
 
     return (
         <div>
@@ -86,4 +109,13 @@ function ProductDetail(){
     )
     
 }
+function RandomColor(){
+    const letters = '0123456789ABCD';
+    let color ='#';
+    for (let i=0;i<6;i++){
+        color += letters[Math.floor(Math.random()*16)];
+    }
+    return color;
+}
+
 export default ProductDetail;

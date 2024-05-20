@@ -53,7 +53,8 @@ async function TestWebScraping2 () {
         const name = TitleName ? TitleName.innerText.trim() : '-';
 
         const PriceName = ShopProduct.querySelector('._36cb0914 ');
-        const price = PriceName ? PriceName.innerText.trim() : '-';
+        const priceString = PriceName ? PriceName.innerText.trim() : '-';
+        const price = parseFloat(priceString.replace(/[^\d.-]/g, '').replace(',','.'));
    
         console.log(createdAt)
   
@@ -129,7 +130,7 @@ async function TestWebScraping2 () {
       });
       return ProductList;
     });
-  
+
     const createdAt = new Date(); 
     const ShopProduct = await page.evaluate(function (shopId, createdAt) { //for Each product -> pętla czy istnieje jesśli nie to...
       const ProductEvent = document.querySelectorAll('.b9bdc658');
@@ -147,7 +148,8 @@ async function TestWebScraping2 () {
         const name = TitleName ? TitleName.innerText.trim() : '-';
 
         const PriceName = ShopProduct.querySelector('._36cb0914 ');
-        const price = PriceName ? PriceName.innerText.trim() : '-';
+        const priceString = PriceName ? PriceName.innerText.trim() : '-';
+         const price = parseFloat(priceString.replace(/[^\d.-]/g, '').replace(',','.'));
    
         console.log(createdAt)
   

@@ -78,15 +78,25 @@ async function TestWebScraping() {
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
       const PriceName = ShopProduct.querySelector('.price');
-      const price = PriceName ? PriceName.innerText.trim() : '-';
-    
+      const priceString = PriceName ? PriceName.innerText.trim() : '-';
+
+      const priceArray = priceString.match(/(\d+,\d+)\s*zł/g);
+
+      let discountedPrice = null;
+
+      if (priceArray.length > 1){
+        discountedPrice = parseFloat(priceArray[1].replace(/[^\d,]/g, '').replace(',','.'));
+      } else {
+        discountedPrice = parseFloat(priceArray[0].replace(/[^\d,]/g, '').replace(',','.'));
+      }
+
       console.log(createdAt)
 
       if (href) {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price, createdAt}});
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price: discountedPrice, createdAt}});
 
       }
     });
@@ -173,16 +183,24 @@ async function OBiRozbierzaczeGalezi() {
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
       const PriceName = ShopProduct.querySelector('.price');
-      const price = PriceName ? PriceName.innerText.trim() : '-';
+      const priceString = PriceName ? PriceName.innerText.trim() : '-';
+      const priceArray = priceString.match(/(\d+,\d+)\s*zł/g);
 
-     
+      let discountedPrice = null;
+
+      if (priceArray.length > 1){
+        discountedPrice = parseFloat(priceArray[1].replace(/[^\d,]/g, '').replace(',','.'));
+      } else {
+        discountedPrice = parseFloat(priceArray[0].replace(/[^\d,]/g, '').replace(',','.'));
+      }
+
       console.log(createdAt)
 
       if (href) {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price, createdAt}});
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price: discountedPrice, createdAt}});
 
       }
     });
@@ -268,16 +286,24 @@ async function OBiNozyceZywoplotu() {
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
       const PriceName = ShopProduct.querySelector('.price');
-      const price = PriceName ? PriceName.innerText.trim() : '-';
+      const priceString = PriceName ? PriceName.innerText.trim() : '-';
+      const priceArray = priceString.match(/(\d+,\d+)\s*zł/g);
 
-     
+      let discountedPrice = null;
+
+      if (priceArray.length > 1){
+        discountedPrice = parseFloat(priceArray[1].replace(/[^\d,]/g, '').replace(',','.'));
+      } else {
+        discountedPrice = parseFloat(priceArray[0].replace(/[^\d,]/g, '').replace(',','.'));
+      }
+
       console.log(createdAt)
 
       if (href) {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price, createdAt}});
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price: discountedPrice, createdAt}});
 
       }
     });
@@ -355,16 +381,24 @@ async function OBItelefonyp1() {
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
       const PriceName = ShopProduct.querySelector('.price');
-      const price = PriceName ? PriceName.innerText.trim() : '-';
+      const priceString = PriceName ? PriceName.innerText.trim() : '-';
+      const priceArray = priceString.match(/(\d+,\d+)\s*zł/g);
 
-     
+      let discountedPrice = null;
+
+      if (priceArray.length > 1){
+        discountedPrice = parseFloat(priceArray[1].replace(/[^\d,]/g, '').replace(',','.'));
+      } else {
+        discountedPrice = parseFloat(priceArray[0].replace(/[^\d,]/g, '').replace(',','.'));
+      }
+
       console.log(createdAt)
 
       if (href) {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price, createdAt}});
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price: discountedPrice, createdAt}});
 
       }
     });
@@ -443,16 +477,24 @@ async function OBItelefonyp2() {
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
       const PriceName = ShopProduct.querySelector('.price');
-      const price = PriceName ? PriceName.innerText.trim() : '-';
+      const priceString = PriceName ? PriceName.innerText.trim() : '-';
+      const priceArray = priceString.match(/(\d+,\d+)\s*zł/g);
 
-     
+      let discountedPrice = null;
+
+      if (priceArray.length > 1){
+        discountedPrice = parseFloat(priceArray[1].replace(/[^\d,]/g, '').replace(',','.'));
+      } else {
+        discountedPrice = parseFloat(priceArray[0].replace(/[^\d,]/g, '').replace(',','.'));
+      }
+
       console.log(createdAt)
 
       if (href) {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price, createdAt}});
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price: discountedPrice, createdAt}});
 
       }
     });

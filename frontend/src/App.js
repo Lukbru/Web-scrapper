@@ -4,6 +4,7 @@ import Product from './Product';
 import ShopProduct from './ShopProduct';
 import ConnectProducts from './ConnectProducts';
 import ProductDetail from './ProductDetail';
+import Categories from './Categories';
 
 function App() {
   const navbar={
@@ -30,6 +31,9 @@ function App() {
         <Link to = './ShopProduct' style={linkboxes}>ShopProduct</Link>
       </li>
       <li style={menuboxes}>
+        <Link to = './Categories' style={linkboxes}>Categories</Link>
+      </li>
+      <li style={menuboxes}>
         <Link to = './' style={linkboxes}>Product</Link>
       </li>
       </nav>
@@ -42,6 +46,8 @@ function App() {
         <Route path="/products" element={<Product />} />
 
         <Route path="/shopproduct" element={<ShopProduct />} />
+
+        <Route path="/Categories" element={<Categories />} />
 
         <Route path="/ConnectProducts/:shopProductId" element={<ConnectProducts />} />
 

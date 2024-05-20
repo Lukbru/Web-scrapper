@@ -1,3 +1,4 @@
+import 'chartjs-adapter-date-fns';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';

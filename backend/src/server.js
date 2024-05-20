@@ -81,8 +81,21 @@ client.connect().then(() => {
   });
 
   app.get('/category', async (req, res) => {  
-    const categories = await category_collection.find().toArray();
+    const categories = await category_collection.find({}, { sort: {level: 1} }).toArray();
     res.json(categories);
+  });
+
+  app.post('/category', async (req, res) => {  
+    const {name, level, parentCategoryId} = req.body;
+    if (!name || typeof level !== 'number'){
+      return res.status(400).json({ message: 'Wrong inputs - please try again.'})
+    }
+  
+    const newCategory = {name, level, parentCategoryId: level<2?null:parentCategoryId};
+    const categbox = await category_collection.insertOne(newCategory);
+    res.status(200).json({
+      id: categbox.insertedId
+    });
   });
 
    app.get('/products/:productId', async (req, res)=> {

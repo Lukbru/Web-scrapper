@@ -135,7 +135,7 @@ async function savePrice(data) {
   const collection = database.collection('ShopProductPrice');
 
   await collection.insertOne({
-    version: 1,
+    version: 2,
     price: data.price,
     shopProductId: data.shopProductId,
     createdAt: new Date(data.createdAt)
