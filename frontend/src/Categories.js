@@ -7,6 +7,9 @@ function Product() {
     const [error, setError] = useState(null);
     const [categories, setCategories] = useState([]);
     const [newCategory, setnewCategory] = useState({name:'',level:1,parentCategoryId: null});
+    const [products, setProducts] = useState([]);
+    const [selectCategory, setSelectCategory] = useState('');
+    const [selectProduct, setSelectProduct] = useState('');
 
     const fetchCategories = async () => {
         try {
@@ -22,6 +25,22 @@ function Product() {
         }
     };
 
+    const fetchProducts = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/products');
+
+            if (response.status !== 200) {
+                throw new error('Error - please try again later')
+            }
+
+            setLoading(false);
+            setProducts(response.data);
+        } catch (error) {
+            setError('Failed to load products');
+            setLoading(false);
+        }
+    };
+
     const addCategory = async (e) => {
         e.preventDefault();
         const { name, level, parentCategoryId } = newCategory;
@@ -32,8 +51,24 @@ function Product() {
         setCategories([...categories, response.data]);
     };
 
+    const ChangeCategory = async (e) => {
+        if (!selectProduct||!selectCategory){
+            setError('Both Category and Product need to be selected');
+            return;
+        } else {
+            const response = await axios.put('http://localhost:3000/productsCategory', {
+            productId: selectProduct,    
+            categoryId: selectCategory});
+            if (response.status !== 200){
+                throw new Error('Error - please in chaning category, please try again later');
+            }
+            setProducts(products.map(Product=>Product._id === selectProduct ? {...Product, categoryId: selectCategory} : Product));
+        }
+    };
+
     useEffect(() => {
         fetchCategories();
+        fetchProducts();
     }, []);
 
 
@@ -118,6 +153,34 @@ function Product() {
                     <button type="submit">Add Category</button></form></div>
             {loading && <p>Loading...</p>}
             {error && <p>{error}</p>}
+            <div>
+                <select 
+                id='selectProduct'
+                value={selectProduct}
+                onChange={(e)=> setSelectProduct(e.target.value)}
+                >
+                    <option value=''>Select Product</option>
+                    {products.map((product)=>(
+                        <option key={product._id} value={product._id}>
+                            {product.name}
+                        </option>
+                    ))}
+                </select>
+                <select 
+                id='selectCategory'
+                value={selectCategory}
+                onChange={(e)=> setSelectCategory(e.target.value)}
+                >
+                    <option value=''>Select Category</option>
+                    {categories.map((category)=>(
+                        <option key={category._id} value={category._id}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
+                <button onClick={ChangeCategory}>Change Category</button>
+            </div>
+
         </div>
     );
 }

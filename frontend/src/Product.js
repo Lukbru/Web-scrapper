@@ -42,15 +42,28 @@ function Product() {
         }
     };
 
+    const getAllCategories = (categoryId) => {
+        const allCategoriesId = [categoryId];
+        const getChildCategory = (parentId) => {
+            category.forEach(category => {
+                if (category.parentCategoryId === parentId){
+                    allCategoriesId.push(category._id);
+                    getChildCategory(category._id);
+                }
+            });
+        }
+        getChildCategory(categoryId);
+        return allCategoriesId;
+    }
+
     useEffect(() => {
                 if (SelectCategory === 'All'){
                     setSortProduct(products);
                 } else {
-                    setSortProduct(products.filter(
-                        (product)=> product.categoryId === SelectCategory
-                    ));
+                    const selectedCategory = getAllCategories(SelectCategory);
+                    setSortProduct(products.filter(products=>selectedCategory.includes(products.categoryId)));
                 }
-            }, [SelectCategory,products]);
+            }, [SelectCategory,products, category]);
 
     useEffect(() => {
         fetchProducts();

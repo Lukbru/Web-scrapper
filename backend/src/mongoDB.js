@@ -32,17 +32,16 @@ async function saveToMongoDB(data, collectionName) {
 //Number(cena.slice(0, cena.length-3).replace(',', '.')) 
 
 
-async function CheckMongoDB(data, collectionName) {
+async function CheckMongoDB(data, collectionName) { //TODO CHANGE THE NAMES
   const database = client.db('mydatabase');
   const collection = database.collection(collectionName);
   const options = { upsert: true };
 
   for (const item of data) {
     try {
-      const log = {
+      const filter = {
         $or: [
-          { sourceId: item.SourceID },
-          { link: item.link }
+          { sourceId: item.SourceID }
         ]
       };
       const update = {
@@ -55,7 +54,7 @@ async function CheckMongoDB(data, collectionName) {
         }
       };
 
-      const collectionA = await collection.updateOne(log, update, options);
+      const collectionA = await collection.updateOne(filter, update, options);
       if (collectionA.upsertedCount > 0) {
         console.log('Data updated to MongoDB');
       } else {
@@ -170,8 +169,18 @@ async function upsertShopProduct(product) {
   }
 }
 
+async function findShopByName(shopName) {
+  const database = client.db('mydatabase');
+  const shopsCollection = database.collection("Shops");
+  const shop = await shopsCollection.findOne({ name: shopName });
+  if (!shop) {
+    throw new Error("Shop not found.");
+  }
+  return shop;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms)); // Czeka dany czas
 }
-module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct }
+module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName }

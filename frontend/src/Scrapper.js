@@ -1,0 +1,152 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+
+function Scrapper() {
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [scrapper, setScrapper] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [selectCategory, setSelectCategory] = useState('');
+    const [shops, setShops]= useState([]);
+    const [selectShop, setSelectShop]= useState('')
+    const [linkScrapper, setLinkScrapper] = useState([])
+
+
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/category');
+            if (response.status !== 200) {
+                throw new error('Error - please try again later')
+            }
+            setLoading(false);
+            setCategories(response.data);
+        } catch (error) {
+            setError('Failed to load categories');
+            setLoading(false);
+        }
+    };
+
+    const fetchShops = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/shops');
+            if (response.status !== 200) {
+                throw new error('Error - please try again later')
+            }
+            setLoading(false);
+            setShops(response.data);
+            console.log(response.data)
+        } catch (error) {
+            setError('Failed to load categories');
+            setLoading(false);
+        }
+    };
+
+    const fetchScrapper = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/Scrapper');
+            if (response.status !== 200) {
+                throw new error('Error - please try again later')
+            }
+            setLoading(false);
+            setLinkScrapper(response.data);
+        } catch (error) {
+            setError('Failed to load categories');
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCategories();
+        fetchShops();
+        fetchScrapper();
+    }, []);
+
+    const SaveLinks = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post('http://localhost:3000/Scrapper',{link: scrapper, categoryId : selectCategory, shopId : selectShop});
+            if (response.status !== 200) {
+                throw new error('Error - please try again later')
+            }
+            setLoading(false);
+            setLinkScrapper([...linkScrapper, {link: scrapper, categoryId : selectCategory, shopId : selectShop}]);
+
+        } catch (error) {
+            setError('Failed to save the link');
+            setLoading(false);
+        }
+    };
+
+    const StartScrapper = async () => {
+
+        try {
+            const response = await axios.post('http://localhost:3000/Scrapper/Run');
+            if (response.status !== 200) {
+                throw new error('Error - please try again later')
+            }
+            setLoading(false);
+        } catch (error) {
+            setError('Failed to Run the Scrapper');
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div>
+            <h1>Web Scrapper</h1>
+            <form onSubmit={SaveLinks}>
+                <input
+                type="text"
+                value={scrapper}
+                onChange={(e)=>setScrapper(e.target.value)}
+                placeholder='Space for Link'
+                required
+                /> 
+                <select 
+                id='selectCategory'
+                value={selectCategory}
+                onChange={(e)=> setSelectCategory(e.target.value)}
+                >
+                    <option value='' disabled>Select Category</option>
+                    {categories.map((category)=>(
+                        <option key={category._id} value={category._id}>
+                            {category.name}
+                        </option>
+                    ))}
+                </select>
+                <select
+                value={selectShop}
+                onChange={(e)=>setSelectShop(e.target.value)}
+                required>
+                    <option value='' disabled>Select a Shop</option>
+                    {shops.map(shop=>(
+                        <option key={shop.id} value={shop.id}>
+                            {shop.name}
+                        </option>
+                    ))}
+                </select>
+                <button type='submit' disabled={error}>
+                    {'Add new Scrapper'}
+                </button>
+                </form>
+                {loading && <p>Loading</p>}
+                {error && <p>{error}</p>}
+                <h2>Links thats being Scrapped</h2>
+                <button onClick={StartScrapper} disabled={loading}>
+                    {'Run Scrapper'}
+                </button>
+                <ul>
+                    {linkScrapper.map(scrap=>(
+                        <li key={scrap._id}>
+                            <p>Link : {scrap.link}</p>
+                            <p>Category : {scrap.categoryId}</p>
+                            <p>Shop : {scrap.shopId}</p>
+                       </li>
+                    ))}      
+                </ul>
+        </div>
+    );
+}
+
+export default Scrapper;

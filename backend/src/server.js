@@ -1,10 +1,13 @@
 const cors = require('cors');
+const classValidator = require('class-validator');
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = "mongodb+srv://bruzdalukasz1c:evsPCoHvQN7TERdZ@scrap.mez5fky.mongodb.net/?retryWrites=true&w=majority&appName=Scrap";
 
 const express = require('express');
 const bodyParser = require('body-parser');
+
+const {ScrapeObi} = require('./OBI-Scrapper.js')
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -27,6 +30,7 @@ client.connect().then(() => {
   const shops_collection = db.collection('Shops');
   const shopProduct_collection = db.collection('ShopProduct');
   const productPrice_collection = db.collection('ShopProductPrice');
+  const scrapper_collection = db.collection('Scrapper');
 
   app.get('/shops', async (req, res) => {
     const shops = await shops_collection.find().toArray();
@@ -139,9 +143,89 @@ client.connect().then(() => {
     });
    });
    
+   app.put('/productsCategory', async (req, res) => {
+
+    const {productId, categoryId} = req.body;
+
+    if (!categoryId) {
+      return res.status(400).json({ error: 'categoryId is missing' }); 
+    }
+
+    if (!productId) {
+      return res.status(400).json({ error: 'productId is missing' }); 
+    }
+
+    if (!classValidator.isMongoId(categoryId)) {
+      return res.status(400).json({ error: 'categoryId must be mongo id' }); 
+    }
+    
+    if (!classValidator.isMongoId(productId)) {
+      return res.status(400).json({ error: 'productId must be mongo id' }); 
+    }
+
+    const category = await category_collection.findOne({ _id: new ObjectId(categoryId) });
+    if (!category) {
+      return res.status(400).json({ error: 'category Id doesnt exist ' })
+    }
+
+    const product = await product_collection.findOne({ _id: new ObjectId(productId) });
+    if (!product) {
+      return res.status(400).json({ error: 'Product Id doesnt exist ' })
+    }
+
+    const up_result = await product_collection.updateOne(
+      { _id: new ObjectId(productId) },
+      { $set: { categoryId } }
+    );
+
+    if (up_result.matchedCount === 0) {
+      return res.status(400).json({ error: 'Failed to connect ' })
+    }
+    res.json({
+      categoryId: categoryId,
+      productId: productId
+
+  });
+});
+
+app.post('/Scrapper', async (req, res) => {
+  const {link, categoryId, shopId} = req.body;
+  if (!link){
+    return res.status(400).json({error: 'Link is missing'})
+  }
+  if (!categoryId){
+    return res.status(400).json({error: 'Category is missing'})
+  }
+  if (!shopId){
+    return res.status(400).json({error: 'Shop is missing'})
+  }
+
+  const newScrapper={link,categoryId,shopId};
+  const scrapbox = await scrapper_collection.insertOne(newScrapper);
+  res.status(200).json({ id: scrapbox.insertedId });
+});
  
+app.get('/Scrapper', async (req, res) => {
+  const scrappers = await scrapper_collection.find().toArray();
+  res.json(scrappers);
+});
+
+app.post('/Scrapper/Run', async (req, res) => {
+  const scrappers = await scrapper_collection.find().toArray(); //TODO Filtr w Find
+  const ObiShopId = '6626adc5a5b15d56ea2cb5dc';
+
+  for (const scapper of scrappers){
+    if (scapper.shopId.toString() === ObiShopId){
+      await ScrapeObi(scapper.link, scapper.categoryId);
+    }
+  }
+  res.json();
+});
+
   app.listen(port, () => {
     console.log('Server running on port: 3000')
   });
 });
+
+
 
