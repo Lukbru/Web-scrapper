@@ -139,9 +139,9 @@ function Scrapper() {
                 <ul>
                     {linkScrapper.map(scrap=>(
                         <li key={scrap._id}>
-                            <p>Link : {scrap.link}</p>
-                            <p>Category : {scrap.categoryId}</p>
-                            <p>Shop : {scrap.shopId}</p>
+                            <p>Link : <a href={scrap.link}>{scrap.link}</a></p>
+                            <p>Category : {categories.find(categ=>categ._id === scrap.categoryId)?.name}</p>
+                            <p>Shop : {shops.find(shop=>shop.id === scrap.shopId)?.name}</p>
                        </li>
                     ))}      
                 </ul>

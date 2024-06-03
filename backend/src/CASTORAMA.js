@@ -52,9 +52,9 @@ async function TestWebScraping2 () {
         const TitleName = ShopProduct.querySelector('.ccb9d67a');
         const name = TitleName ? TitleName.innerText.trim() : '-';
 
-        const PriceName = ShopProduct.querySelector('._36cb0914 ');
+        const PriceName = ShopProduct.querySelector('._5d34bd7a ');
         const priceString = PriceName ? PriceName.innerText.trim() : '-';
-        const price = parseFloat(priceString.replace(/[^\d.-]/g, '').replace(',','.'));
+        const price = parseFloat(priceString.replace(/\s/g, '').replace(',', '.'));
    
         console.log(createdAt)
   
@@ -147,9 +147,9 @@ async function TestWebScraping2 () {
         const TitleName = ShopProduct.querySelector('.ccb9d67a');
         const name = TitleName ? TitleName.innerText.trim() : '-';
 
-        const PriceName = ShopProduct.querySelector('._36cb0914 ');
+        const PriceName = ShopProduct.querySelector('._5d34bd7a ');
         const priceString = PriceName ? PriceName.innerText.trim() : '-';
-         const price = parseFloat(priceString.replace(/[^\d.-]/g, '').replace(',','.'));
+        const price = parseFloat(priceString.replace(/\s/g, '').replace(',', '.'));
    
         console.log(createdAt)
   

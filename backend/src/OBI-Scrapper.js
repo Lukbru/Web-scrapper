@@ -9,28 +9,6 @@ async function ScrapeObi(link,categoryId) {
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
 
-  const Item = await page.evaluate(function () {
-    const ItemEvent = document.querySelectorAll('.product.large');
-    const ItemList = [];
-
-    ItemEvent.forEach(Item => {
-
-      const TitleName = Item.querySelector('a.product-wrapper.wt_ignore');
-      const title = TitleName ? TitleName.href : '-';
-
-      const PriceName = Item.querySelector('.price');
-      const price = PriceName ? PriceName.innerText.trim() : '-';
-
-      const DesName = Item.querySelector('.description');
-      const description = DesName ? DesName.innerText.trim() : '-';
-
-
-      ItemList.push({ title, price, description });
-    });
-
-    return ItemList;
-  });
-
   const Product = await page.evaluate(function (categoryId) {
     const ProductEvent = document.querySelectorAll('.product.large');
     const ProductList = [];
@@ -62,25 +40,39 @@ async function ScrapeObi(link,categoryId) {
       const name = TitleName ? TitleName.innerText.trim() : '-';
 
       const PriceName = ShopProduct.querySelector('.price');
-      const priceString = PriceName ? PriceName.innerText.trim() : '-';
+      let priceString = PriceName ? PriceName.innerText.trim() : '-';
 
-      const priceArray = priceString.match(/(\d+,\d+)\s*zł/g);
+       // take second value from prices like "629,00 zł\n499,00 zł"
+       const combinedPriceStringElements = priceString.split('\n');
+       const isCombinedPrice = combinedPriceStringElements.length === 2;
+       if (isCombinedPrice) {
+           priceString = combinedPriceStringElements[1];
+       }
 
-      let discountedPrice = null;
+       // removes suffix from prices like "80,00 zł / szt."
+       const piecesSuffix = " / szt.";
+       const isPiecesString = priceString.endsWith(piecesSuffix);
+       if (isPiecesString) {
+           priceString = priceString.substr(0, priceString.length - piecesSuffix.length);
+       }
 
-      if (priceArray.length > 1){
-        discountedPrice = parseFloat(priceArray[1].replace(/[^\d,]/g, '').replace(',','.'));
-      } else {
-        discountedPrice = parseFloat(priceArray[0].replace(/[^\d,]/g, '').replace(',','.'));
-      }
+       // remove suffix from prices like "80,00 zł"
+       const currencySuffix = " zł";
+       priceString = priceString.slice(0, priceString.length - currencySuffix.length);
 
-      console.log(createdAt)
+       // change comma to dot in price like "249,00 zł"
+       priceString = priceString.replace(',', '.');
+
+       // remove spaces from price like "1 249,00"
+       priceString = priceString.replaceAll(' ', '');
+
+       const parsedPrice = parseFloat(priceString);
 
       if (href) {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price: discountedPrice, createdAt}});
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price: parsedPrice, createdAt}});
 
       }
     });

@@ -8,6 +8,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const {ScrapeObi} = require('./OBI-Scrapper.js')
+const {ScrapeCastorama} = require('./Castorama-Scrapper.js')
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -190,8 +191,11 @@ client.connect().then(() => {
 
 app.post('/Scrapper', async (req, res) => {
   const {link, categoryId, shopId} = req.body;
-  if (!link){
+  if (!link){ 
     return res.status(400).json({error: 'Link is missing'})
+  }
+  if (!classValidator.isURL(link)){
+    return res.status(400).json({error: 'Link must be url'})
   }
   if (!categoryId){
     return res.status(400).json({error: 'Category is missing'})
@@ -213,10 +217,14 @@ app.get('/Scrapper', async (req, res) => {
 app.post('/Scrapper/Run', async (req, res) => {
   const scrappers = await scrapper_collection.find().toArray(); //TODO Filtr w Find
   const ObiShopId = '6626adc5a5b15d56ea2cb5dc';
+  const CastoramaShopId = '66255aee1b80af46d117b52b';
 
   for (const scapper of scrappers){
     if (scapper.shopId.toString() === ObiShopId){
       await ScrapeObi(scapper.link, scapper.categoryId);
+    }
+    if (scapper.shopId.toString() === CastoramaShopId){
+      await ScrapeCastorama(scapper.link, scapper.categoryId);
     }
   }
   res.json();
@@ -229,3 +237,29 @@ app.post('/Scrapper/Run', async (req, res) => {
 
 
 
+/*
+app.post('/Scrapper/Run', async (req, res) => {
+  const shops = await shops_collection.find().toArray();
+  const shopIdScrapper = [];
+  const shopScrapeMap={
+    'OBI' : ScrapeObi,
+    'Castorama': ScrapeCastorama
+  }
+
+  shops.forEach(shop=>{ if (shopScrapeMap[shop.name]){
+    shopIdScrapper[shop._id.toString()]=shopScrapeMap[shop.name];
+  }});
+
+
+  const scrappers = await scrapper_collection.find().toArray(); //TODO Filtr w Find
+
+
+  for (const scapper of scrappers){
+    const scrapeFunction = shopIdScrapper[scapper.shopId.toString()];
+    if (scrapeFunction){
+      await scrapeFunction(scapper.link, scapper.categoryId);
+    }
+  }
+  res.json();
+});
+*/

@@ -126,17 +126,17 @@ async function TestWebScraping() {
     return Category;
   });
 
-  await SaveName(Category, 'Categories');
-  console.log(Category); 
-  await sleep(10000);
-  await CheckMongoDB(ShopProduct, 'ShopProduct');
+  // await SaveName(Category, 'Categories');
+  // console.log(Category); 
+  // await sleep(10000);
+  // await CheckMongoDB(ShopProduct, 'ShopProduct');
  console.log(ShopProduct);
  await sleep(7000);
-  await SaveProduct(Product, 'Products');
+  // await SaveProduct(Product, 'Products');
   console.log(Product);
-  await sleep(10000);
-  await SaveName(Shop, 'Shops');
-  console.log(Shop); 
+  // await sleep(10000);
+  // await SaveName(Shop, 'Shops');
+  // console.log(Shop); 
 
   await browser.close();
 };
@@ -231,17 +231,17 @@ async function OBiRozbierzaczeGalezi() {
   });
   
 
-  await SaveName(Category, 'Categories');
-  console.log(Category); 
-  await sleep(10000);
-  await CheckMongoDB(ShopProduct, 'ShopProduct');
+  // await SaveName(Category, 'Categories');
+  // console.log(Category); 
+  // await sleep(10000);
+  // await CheckMongoDB(ShopProduct, 'ShopProduct');
  console.log(ShopProduct);
  await sleep(7000);
-  await SaveProduct(Product, 'Products');
+  // await SaveProduct(Product, 'Products');
   console.log(Product);
-  await sleep(10000);
-  await SaveName(Shop, 'Shops');
-  console.log(Shop); 
+  // await sleep(10000);
+  // await SaveName(Shop, 'Shops');
+  // console.log(Shop); 
 
   await browser.close();
 };
