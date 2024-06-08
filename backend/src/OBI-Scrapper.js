@@ -5,6 +5,10 @@ async function ScrapeObi(link,categoryId) {
   const browser = await puppeteer.launch(); 
   const page = await browser.newPage();
 
+  page.setExtraHTTPHeaders({
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0'
+  })
+
   await page.goto(link);
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
@@ -25,7 +29,8 @@ async function ScrapeObi(link,categoryId) {
 
   const createdAt = new Date(); 
   const ShopProduct = await page.evaluate(function (shopId, createdAt) { 
-    const ProductEvent = document.querySelectorAll('.product.large');
+    
+    const ProductEvent = document.querySelectorAll('.product.large')
     const ProductList = [];
 
     ProductEvent.forEach(async (ShopProduct) => {
@@ -96,11 +101,11 @@ async function ScrapeObi(link,categoryId) {
   });
 
   await CheckMongoDB(ShopProduct, 'ShopProduct');
- console.log(ShopProduct);
- await sleep(7000);
+  console.log(ShopProduct);
+  await sleep(25000);
   await SaveProduct(Product, 'Products');
   console.log(Product);
-  await sleep(10000);
+  await sleep(62000);
   await SaveName(Shop, 'Shops');
   console.log(Shop); 
 

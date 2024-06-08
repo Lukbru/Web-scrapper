@@ -77,10 +77,10 @@ async function ScrapeCastorama (link,categoryId) {
 
     await CheckMongoDB(ShopProduct, 'ShopProduct');
    console.log(ShopProduct);
-   await sleep(7000);
+   await sleep(20000);
     await SaveProduct(Product, 'Products');
     console.log(Product);
-    await sleep(10000);
+    await sleep(62000);
     await SaveName(Shop, 'Shops');
     console.log(Shop); 
   

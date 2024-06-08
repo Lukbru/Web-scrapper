@@ -24,20 +24,20 @@ async function run() {
     await TestWebScraping();
     await sleep(7000);
     await OBiRozbierzaczeGalezi();
-    // await sleep(7000);
+    await sleep(7000);
+    await OBiNozyceZywoplotu();
+    await sleep(7000);
+    await OBItelefonyp1();
+    await sleep(7000);
+    await OBItelefonyp2();
+
+    await sleep(7000);
+    await TestWebScraping2();
+    await sleep(7000);
+    await CastoramaRozbierzaczeGalezi();
+
+    // await OBiRozbierzaczeGalezi();
     // await OBiNozyceZywoplotu();
-    // await sleep(7000);
-    // await OBItelefonyp1();
-    // await sleep(7000);
-    // await OBItelefonyp2();
-
-    // await sleep(7000);
-    // await TestWebScraping2();
-    // await sleep(7000);
-    // await CastoramaRozbierzaczeGalezi();
-
-    //await OBiRozbierzaczeGalezi();
-    //await OBiNozyceZywoplotu();
 
 
   } finally {
@@ -49,3 +49,4 @@ async function run() {
 
 run().catch(console.dir);
 cron.schedule('0 0 12 * * *',run);
+

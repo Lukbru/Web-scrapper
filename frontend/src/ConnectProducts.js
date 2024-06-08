@@ -1,28 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Routes, Route, useParams } from 'react-router-dom';
-
-
-function displayProducts(products, loading, error) {
-    if (loading || error) {
-        return;
-    }
-
-    return (
-        <>
-            {products.map((product) =>
-                <option value={product.id}>{product.name}</option>
-            )}
-        </>
-    )
-}
+import { useParams } from 'react-router-dom';
 
 function ConnectProducts() {
     const selectedShopProduct = useParams().shopProductId;
 
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [products, setProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState('');
     const [status, setStatus] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [selectCategory, setSelectCategory] = useState('');
+    const [sortProduct, setSortProduct] = useState([]);
 
     const fetchProducts = async () => {
         try {
@@ -35,9 +25,37 @@ function ConnectProducts() {
         }
     };
 
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/category');
+            if (response.status !== 200) {
+                throw new error('Error - please try again later')
+            }
+            setLoading(false);
+            setCategories(response.data);
+        } catch (error) {
+            setError('Failed to load categories');
+            setLoading(false);
+        }
+    };
+
+    const getAllCategories = (categoryId) => {
+        const allCategoriesId = [categoryId];
+        const getChildCategory = (parentId) => {
+            categories.forEach(category => {
+                if (category.parentCategoryId === parentId){
+                    allCategoriesId.push(category._id);
+                    getChildCategory(category._id);
+                }
+            });
+        }
+        getChildCategory(categoryId);
+        return allCategoriesId;
+    }
+
     const Connection = async (e) => {
         if (!selectedProduct) {
-            // TODO ustaw status na dole strony ze nie wybrano nic
+            setStatus('Please select product to connect.')
             return;
         }
 
@@ -54,25 +72,43 @@ function ConnectProducts() {
     };
 
     useEffect(() => {
-        // TODO jak ktos w sciezce poda cos innego niz shopProductId to trzeba powrocic do strony glownej #walidacja
-        // najlepiej zrobic osobny endpoint w serwerze i tam przesylac id i zwracac status 404 jesli taki nie istnieje a jesli istnieje to status i jego dane
+        if (selectCategory === 'All'){
+            setSortProduct(products);
+        } else {
+            const selectedCategory = getAllCategories(selectCategory);
+            setSortProduct(products.filter(products=>selectedCategory.includes(products.categoryId)));
+        }
+    }, [selectCategory,products, categories]);
+
+    useEffect(() => {
         fetchProducts();
+        fetchCategories();
     }, []);
-
-
-    // function listOptions(collection) {
-    //     return collection.map((element) => (
-    //         <option key={element.id} value={element.id}>
-    //             {element.name}
-    //         </option>
-    //     ))
-    // }
 
     return (
         <div>
+            <h1></h1>
             Selected shopProductId: {selectedShopProduct}
-
             <form onSubmit={Connection}>
+            <div>
+                <label htmlFor="category_selected">
+                Sort by Category
+                </label>
+                <select 
+                        id="category_selected"
+                        value={selectCategory}
+                        onChange={(e)=>setSelectCategory(e.target.value)}
+                    >
+                        <option value='' disabled>Select Category</option>
+                        <option value='All'>All</option>
+                        {categories.map(category=>(
+                            <option key={category._id} value={category._id}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
+            </div>
+
                 <div>
                     <label htmlFor="product_selected">
                         Select Product
@@ -83,10 +119,14 @@ function ConnectProducts() {
                         onChange={(e) => setSelectedProduct(e.target.value)}
                         required
                     >
-                        {displayProducts(products.map(product => ({ id: product._id, name: product.name })))}
+                        <option value='' disabled>Select Product</option>
+                        {sortProduct.map(product => (
+                            <option key={product._id} value={product._id}>
+                                {product.name} 
+                            </option> 
+                        ))}
                     </select>
                 </div>
-
                 <button type="submit">Connect</button>
             </form>
 

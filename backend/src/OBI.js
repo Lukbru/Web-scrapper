@@ -17,7 +17,7 @@ async function TestWebScraping() {
   const browser = await puppeteer.launch();   //({ headless : false }) - pokazuje nam  ze otwiera przegladarke
   const page = await browser.newPage();
 
-  await page.goto('https://www.obi.pl/maszyny-ogrodnicze/glebogryzarki/c/1402');
+  await page.goto('https://www.obi.pl/maszyny-ogrodnicze/glebogryzarki/c/1402'); 
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
 
@@ -80,7 +80,7 @@ async function TestWebScraping() {
       const PriceName = ShopProduct.querySelector('.price');
       const priceString = PriceName ? PriceName.innerText.trim() : '-';
 
-      const priceArray = priceString.match(/(\d+,\d+)\s*zł/g);
+      const priceArray = priceString.match(/(\d+,\d+)\s*zł/g);  // TODO CHANGE THIS 
 
       let discountedPrice = null;
 
@@ -103,14 +103,14 @@ async function TestWebScraping() {
     return ProductList;
   }, shopId, createdAt);
 
-  await Promise.all(ShopProduct.map( async(data) => {
-    const shopProductId = await upsertShopProduct(data.product);
-    await savePrice({
-      price: data.price.price,
-      shopProductId: shopProductId,
-      createdAt: data.price.createdAt
-    });
-  }))
+  // await Promise.all(ShopProduct.map( async(data) => {
+  //   const shopProductId = await upsertShopProduct(data.product);
+  //   await savePrice({
+  //     price: data.price.price,
+  //     shopProductId: shopProductId,
+  //     createdAt: data.price.createdAt
+  //   });
+  // }))
 
   const Shop = await page.evaluate(() => {
     const Shop = [];
@@ -134,8 +134,8 @@ async function TestWebScraping() {
  await sleep(7000);
   // await SaveProduct(Product, 'Products');
   console.log(Product);
-  // await sleep(10000);
-  // await SaveName(Shop, 'Shops');
+  await sleep(10000);
+  await SaveName(Shop, 'Shops');
   // console.log(Shop); 
 
   await browser.close();

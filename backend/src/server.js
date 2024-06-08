@@ -60,6 +60,10 @@ client.connect().then(() => {
       return res.status(400).json({ error: 'shopProductId and productId must exist' });
     }
 
+    if (!ObjectId.isValid(shopProductId)){
+      return res.status(400).json({ error: 'such shopProductId Id doesnt exist in database' });
+    }
+
     const shopProduct = await shopProduct_collection.findOne({ _id: new ObjectId(shopProductId) });
     if (!shopProduct) {
       return res.status(400).json({ error: 'shopProduct Id doesnt exist ' })
