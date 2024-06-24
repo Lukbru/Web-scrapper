@@ -11,6 +11,7 @@ function Scrapper() {
     const [shops, setShops]= useState([]);
     const [selectShop, setSelectShop]= useState('')
     const [linkScrapper, setLinkScrapper] = useState([])
+    const [selectScrapper, setSelectScrapper] = useState([])
 
 
     const fetchCategories = async () => {
@@ -56,6 +57,16 @@ function Scrapper() {
         }
     };
 
+    const checkBoxScrapper=(scrapId)=>{
+        setSelectScrapper(checkId=>{
+            if (checkId.includes(scrapId)){
+                return checkId.filter(id => id !== scrapId);
+            } else {
+                return [...checkId,scrapId]
+            }
+        });
+    }
+
     useEffect(() => {
         fetchCategories();
         fetchShops();
@@ -81,7 +92,8 @@ function Scrapper() {
     const StartScrapper = async () => {
 
         try {
-            const response = await axios.post('http://localhost:3000/Scrapper/Run');
+            const selectedCheckBoxes = linkScrapper.filter(scrap=> selectScrapper.includes(scrap._id))
+            const response = await axios.post('http://localhost:3000/Scrapper/Run',{ scrapper: selectedCheckBoxes });
             if (response.status !== 200) {
                 throw new error('Error - please try again later')
             }
@@ -139,7 +151,13 @@ function Scrapper() {
                 <ul>
                     {linkScrapper.map(scrap=>(
                         <li key={scrap._id}>
-                            <p>Link : <a href={scrap.link}>{scrap.link}</a></p>
+                            <p>
+                            < input 
+                        type='checkbox'
+                        checked={selectScrapper.includes(scrap._id)}
+                        onChange={()=> checkBoxScrapper(scrap._id)}
+                           />
+                            Link : <a href={scrap.link}>{scrap.link}</a></p>
                             <p>Category : {categories.find(categ=>categ._id === scrap.categoryId)?.name}</p>
                             <p>Shop : {shops.find(shop=>shop.id === scrap.shopId)?.name}</p>
                        </li>

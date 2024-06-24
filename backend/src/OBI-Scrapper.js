@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName } = require('./mongoDB.js');
+const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName, randomDelay} = require('./mongoDB.js');
 
 async function ScrapeObi(link,categoryId) {
   const browser = await puppeteer.launch(); 
@@ -13,27 +13,18 @@ async function ScrapeObi(link,categoryId) {
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
 
-  const Product = await page.evaluate(function (categoryId) {
-    const ProductEvent = document.querySelectorAll('.product.large');
-    const ProductList = [];
-
-    ProductEvent.forEach(Product => {
-
-      const TitleName = Product.querySelector('.description');
-      const name = TitleName ? TitleName.innerText.trim() : '-';
-
-      ProductList.push({ name, categoryId });
-    });
-    return ProductList;
-  },categoryId);
-
   const createdAt = new Date(); 
-  const ShopProduct = await page.evaluate(function (shopId, createdAt) { 
-    
+  const {ProductList, ProductNameList} = await page.evaluate(function (shopId, createdAt, categoryId) { 
     const ProductEvent = document.querySelectorAll('.product.large')
     const ProductList = [];
+    const ProductNameList = [];
 
     ProductEvent.forEach(async (ShopProduct) => {
+
+    const ProductTytle = ShopProduct.querySelector('.description');
+    const productName = ProductTytle ? ProductTytle.innerText.trim() : '-';
+
+    ProductNameList.push({ productName, categoryId }); 
 
       const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
       const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
@@ -81,10 +72,10 @@ async function ScrapeObi(link,categoryId) {
 
       }
     });
-    return ProductList;
-  }, shopId, createdAt);
+    return {ProductList, ProductNameList};
+  }, shopId, createdAt, categoryId);
 
-  await Promise.all(ShopProduct.map( async(data) => {
+  await Promise.all(ProductList.map( async(data) => {
     const shopProductId = await upsertShopProduct(data.product);
     await savePrice({
       price: data.price.price,
@@ -100,12 +91,11 @@ async function ScrapeObi(link,categoryId) {
     return Shop;
   });
 
-  await CheckMongoDB(ShopProduct, 'ShopProduct');
-  console.log(ShopProduct);
-  await sleep(25000);
-  await SaveProduct(Product, 'Products');
-  console.log(Product);
-  await sleep(62000);
+  await CheckMongoDB(ProductList, 'ShopProduct');
+  console.log(ProductList);
+  await SaveProduct(ProductNameList, 'Products');
+  console.log(ProductNameList);
+  await sleep(randomDelay(5000, 22000));
   await SaveName(Shop, 'Shops');
   console.log(Shop); 
 

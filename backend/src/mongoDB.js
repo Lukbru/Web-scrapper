@@ -183,4 +183,9 @@ async function findShopByName(shopName) {
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms)); // Czeka dany czas
 }
-module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName }
+
+async function randomDelay(max, min){
+  return Math.floor(Math.random()* (max - min + 1) + min);
+}
+
+module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName,randomDelay }

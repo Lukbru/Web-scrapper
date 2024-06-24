@@ -219,11 +219,14 @@ app.get('/Scrapper', async (req, res) => {
 });
 
 app.post('/Scrapper/Run', async (req, res) => {
-  const scrappers = await scrapper_collection.find().toArray(); //TODO Filtr w Find
+  const { scrapper } = req.body
+  const scrapperIds = scrapper.map(scrap=> new ObjectId(scrap._id))
+  const checkedScrappers = await scrapper_collection.find({ _id: {$in:scrapperIds}}).toArray();
+  // const scrappers = await scrapper_collection.find().toArray(); //TODO Filtr w Find
   const ObiShopId = '6626adc5a5b15d56ea2cb5dc';
   const CastoramaShopId = '66255aee1b80af46d117b52b';
 
-  for (const scapper of scrappers){
+  for (const scapper of checkedScrappers){
     if (scapper.shopId.toString() === ObiShopId){
       await ScrapeObi(scapper.link, scapper.categoryId);
     }
