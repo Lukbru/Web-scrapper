@@ -67,6 +67,14 @@ function Scrapper() {
         });
     }
 
+    const selectedAll = () => {
+        if (selectScrapper.length === linkScrapper.length){
+            setSelectScrapper([]);
+        } else {
+            setSelectScrapper(linkScrapper.map(scrapper=>scrapper._id));
+        }
+    }
+
     useEffect(() => {
         fetchCategories();
         fetchShops();
@@ -145,6 +153,9 @@ function Scrapper() {
                 {loading && <p>Loading</p>}
                 {error && <p>{error}</p>}
                 <h2>Links thats being Scrapped</h2>
+                <button onClick={selectedAll}>
+                    {'Select All'}
+                </button>
                 <button onClick={StartScrapper} disabled={loading}>
                     {'Run Scrapper'}
                 </button>

@@ -32,12 +32,15 @@ function displayShopProducts(ShopProducts, loading, error) {
 
 function Product() {
     const [ShopProduct, setShopProduct] = useState([]);
+    const [shop, setShop] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
+    const [selectShopA, setSelectShopA]= useState('')
+    const [selectShopB, setSelectShopB]= useState('')
+    
     const fetchShop_products = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/shopproduct');
+            const response = await axios.get('http://localhost:3000/shopproduct'); 
 
             if (response.status !== 200) {
                 throw new error('Error - please try again later')
@@ -51,18 +54,58 @@ function Product() {
         }
     };
 
+    const fetch_shops = async () => {
+        try {
+            const response = await axios.get('http://localhost:3000/shops'); 
+
+            if (response.status !== 200) {
+                throw new error('Error - please try again later')
+            }
+            setShop(response.data);
+            setLoading(false);
+        } catch (error) {
+            setError('Failed to load products');
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
         fetchShop_products();
+        fetch_shops();
     }, []);
 
-    return (
-        <div>
+    const filterProductsA = ShopProduct.filter(shopProduct => shopProduct.shopId === selectShopA);
+    const filterProductsB = ShopProduct.filter(shopProduct => shopProduct.shopId === selectShopB);
+
+return (
+    <div>
             <h1>Shop Product List</h1>
             {loading && <p>Loading</p>}
             {error && <p>{error}</p>}
-            {displayShopProducts(ShopProduct, loading, error)}
+        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+            <div style={{flex:1}}>
+                <h2>Select Shop</h2>
+                <select id="selectShopA" value={selectShopA} onChange={(e)=> setSelectShopA(e.target.value)}>
+                    <option value=''>None</option>
+                    {shop.map((shop=>(
+                        <option key={shop.id} value={shop.id}>{shop.name}</option>
+                    )))}
+                </select>
+                {displayShopProducts(filterProductsA, loading, error)}
+            </div>
+            <div style={{flex:1}}>
+            <h2>Select Shop</h2>
+                <select id="selectShopB" value={selectShopB} onChange={(e)=> setSelectShopB(e.target.value)}>
+                    <option value=''>None</option>
+                    {shop.map((shop=>(
+                        <option key={shop.id} value={shop.id}>{shop.name}</option>
+                    )))}
+                </select>
+                {displayShopProducts(filterProductsB, loading, error)}
+            </div>
         </div>
-    );
+    </div>
+);
 }
 
 export default Product;

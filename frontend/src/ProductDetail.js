@@ -13,7 +13,8 @@ import {
     Legend,
   } from 'chart.js';
   import { Line } from 'react-chartjs-2'; 
-  import { Chart } from 'chart.js';
+  import DatePicker from 'react-datepicker';
+  import 'react-datepicker/dist/react-datepicker.css';
 
 ChartJS.register(
     CategoryScale,
@@ -32,6 +33,8 @@ function ProductDetail(){
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [shops, setShops] = useState({});
+    const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 4));
+    const [endDate, setEndDate] = useState(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0));
 
     const fetchProductsAndPrices = async () => {
         try {
@@ -54,6 +57,13 @@ function ProductDetail(){
         }
     };
 
+    const filterPricesByDate = (price) => {
+        return price.filter(priceData => {
+            const date = new Date(priceData.createdAt);
+            return date >= startDate && date <= endDate;
+        });
+    }
+
     useEffect(() => {
         fetchProductsAndPrices();
     }, [productId]);
@@ -66,17 +76,35 @@ function ProductDetail(){
         const datasets  = product.shopProducts.map(shopProduct=>{
             return {
                 label:shops[shopProduct.shopId],
-                data: shopProduct.prices.map(priceData=> ({
+                data: filterPricesByDate(shopProduct.prices).map(priceData=> ({
                     x: new Date(priceData.createdAt),
                     y: priceData.price
                 })),
                 borderColor: RandomColor()
             }});
         
-        const labels= [...new Set(product.shopProducts.flatMap(shopProduct=>shopProduct.prices.map(priceData=>new Date(priceData.createdAt).toLocaleDateString())))];
+        const labels= [...new Set(datasets.flatMap(shopProduct=>shopProduct.data.map(priceData=> priceData.x.toLocaleDateString())))];
 
   return (
     <div>Shops
+        <div style={{ display: 'flex'}}>
+        <DatePicker
+            selected={startDate}
+            onChange={(date)=>setStartDate(date)}
+            selectsStart
+            startDate={startDate}
+            endDate={endDate}
+            dateFormat="d.MM.yyyy"
+        />
+        <DatePicker
+            selected={endDate}
+            onChange={(date)=>setEndDate(date)}
+            selectsEnd
+            startDate={startDate}
+            endDate={endDate}
+            dateFormat="d.MM.yyyy"
+        />
+        </div>
         <div style={{width: "80%", display: 'flex', justifyContent: 'center'}}>
                 <Line data={{
                      labels,
