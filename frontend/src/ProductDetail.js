@@ -33,7 +33,7 @@ function ProductDetail(){
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [shops, setShops] = useState({});
-    const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), 4));
+    const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), new Date().getMonth()));
     const [endDate, setEndDate] = useState(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0));
 
     const fetchProductsAndPrices = async () => {

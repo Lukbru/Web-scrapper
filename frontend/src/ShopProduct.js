@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-function displayShopProducts(ShopProducts, loading, error) {
+function displayShopProducts(ShopProducts, loading, error, selectShopProduct, checkBoxShoProduct) {
     if (loading || error) {
         return;
     }
@@ -17,7 +17,12 @@ function displayShopProducts(ShopProducts, loading, error) {
                     <p>Source ID: {ShopProduct.sourceId}</p>
                     <p>Name: {ShopProduct.name}</p>
                     <p>Data: {ShopProduct.createdAt}</p>
-                    <p>Product Id: {
+                    <p>Product Id: 
+                    < input 
+                        type='checkbox'
+                        checked={selectShopProduct.includes(ShopProduct._id)}
+                        onChange={()=> checkBoxShoProduct(ShopProduct._id)}
+                           />{
                         ShopProduct.productId ?
                             ShopProduct.productId :
                             <button>
@@ -35,8 +40,10 @@ function Product() {
     const [shop, setShop] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectShopA, setSelectShopA]= useState('')
-    const [selectShopB, setSelectShopB]= useState('')
+    const [selectShopA, setSelectShopA] = useState('');
+    const [selectShopB, setSelectShopB] = useState('');
+    const [connectedProduct, setConnectedProduct] = useState('All');
+    const [selectShopProduct, setSelectShopProduct]= useState([]);
     
     const fetchShop_products = async () => {
         try {
@@ -77,6 +84,23 @@ function Product() {
     const filterProductsA = ShopProduct.filter(shopProduct => shopProduct.shopId === selectShopA);
     const filterProductsB = ShopProduct.filter(shopProduct => shopProduct.shopId === selectShopB);
 
+    const filterConnected = (ShopProduct, filter) => {
+        return ShopProduct.filter(product=>{
+            if (filter === 'Connected') return product.productId;
+            if (filter === 'Not Connected') return !product.productId;
+            return true;
+        });
+    }
+
+    const checkBoxShoProduct = (shopProductId) => {
+        // setSelectShopProduct(shopProducts=>0
+        //     shopProducts.includes(shopProductId) ? shopProducts.filter(id => id !== shopProductId) : [...shopProducts, shopProductId]
+        // );
+        const newShopProductsIds = selectShopProduct.includes(shopProductId) ? selectShopProduct.filter(id => id !== shopProductId) : [...selectShopProduct, shopProductId]
+        setSelectShopProduct(newShopProductsIds);
+        sessionStorage.setItem('selectShopProduct', JSON.stringify(newShopProductsIds));
+    }
+
 return (
     <div>
             <h1>Shop Product List</h1>
@@ -91,7 +115,12 @@ return (
                         <option key={shop.id} value={shop.id}>{shop.name}</option>
                     )))}
                 </select>
-                {displayShopProducts(filterProductsA, loading, error)}
+                <select id="connectedProduct" value={connectedProduct} onChange={(e)=> setConnectedProduct(e.target.value)}>
+                    <option value="All">All</option>
+                    <option value="Connected">Connected</option>
+                    <option value="Not Connected">Not Connected</option>
+                </select>
+                {displayShopProducts(filterConnected(filterProductsA, connectedProduct), loading, error,selectShopProduct, checkBoxShoProduct)}
             </div>
             <div style={{flex:1}}>
             <h2>Select Shop</h2>
@@ -101,7 +130,12 @@ return (
                         <option key={shop.id} value={shop.id}>{shop.name}</option>
                     )))}
                 </select>
-                {displayShopProducts(filterProductsB, loading, error)}
+                <select id="connectedProduct" value={connectedProduct} onChange={(e)=> setConnectedProduct(e.target.value)}>
+                    <option value="All">All</option>
+                    <option value="Connected">Connected</option>
+                    <option value="Not Connected">Not Connected</option>
+                </select>
+                {displayShopProducts(filterConnected(filterProductsB, connectedProduct), loading, error,selectShopProduct, checkBoxShoProduct)}
             </div>
         </div>
     </div>

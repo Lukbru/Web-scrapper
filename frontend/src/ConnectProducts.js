@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import CategoryTree from './CategoryTree';
 
 function ConnectProducts() {
-    const selectedShopProduct = useParams().shopProductId;
-
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [products, setProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState('');
     const [status, setStatus] = useState('');
-    const [categories, setCategories] = useState([]);
-    const [selectCategory, setSelectCategory] = useState('');
+    const [selectCategoryIds, setSelectCategoryIds] = useState('');
     const [sortProduct, setSortProduct] = useState([]);
+    const [selectShopProduct, setSelectShopProduct]= useState([]);
+
+    useEffect(()=>{
+        const storedSelectedShopProduct = sessionStorage.getItem('selectShopProduct')
+        if (storedSelectedShopProduct) {
+            setSelectShopProduct(JSON.parse(storedSelectedShopProduct));
+        }
+    },[]);
 
     const fetchProducts = async () => {
         try {
@@ -25,34 +31,6 @@ function ConnectProducts() {
         }
     };
 
-    const fetchCategories = async () => {
-        try {
-            const response = await axios.get('http://localhost:3000/category');
-            if (response.status !== 200) {
-                throw new error('Error - please try again later')
-            }
-            setLoading(false);
-            setCategories(response.data);
-        } catch (error) {
-            setError('Failed to load categories');
-            setLoading(false);
-        }
-    };
-
-    const getAllCategories = (categoryId) => {
-        const allCategoriesId = [categoryId];
-        const getChildCategory = (parentId) => {
-            categories.forEach(category => {
-                if (category.parentCategoryId === parentId){
-                    allCategoriesId.push(category._id);
-                    getChildCategory(category._id);
-                }
-            });
-        }
-        getChildCategory(categoryId);
-        return allCategoriesId;
-    }
-
     const Connection = async (e) => {
         if (!selectedProduct) {
             setStatus('Please select product to connect.')
@@ -61,10 +39,14 @@ function ConnectProducts() {
 
         e.preventDefault();
         try {
-            await axios.put('http://localhost:3000/connect', {
-                productId: selectedProduct,
-                shopProductId: selectedShopProduct
-            });
+            await Promise.all(
+                selectShopProduct.map((shopProductId)=>
+                    axios.put('http://localhost:3000/connect',{
+                        productId: selectedProduct,
+                        shopProductId
+                    }
+                ))
+            );
             setStatus('Connected both collections together');
         } catch (error) {
             setStatus('Something failed while connecting collections');
@@ -72,41 +54,35 @@ function ConnectProducts() {
     };
 
     useEffect(() => {
-        if (selectCategory === 'All'){
-            setSortProduct(products);
-        } else {
-            const selectedCategory = getAllCategories(selectCategory);
-            setSortProduct(products.filter(products=>selectedCategory.includes(products.categoryId)));
-        }
-    }, [selectCategory,products, categories]);
+        fetchProducts();
+    }, []);
 
     useEffect(() => {
-        fetchProducts();
-        fetchCategories();
-    }, []);
+        filtrProducts();
+    }, [selectCategoryIds, products]);
+
+    const filtrProducts = () => {
+        if (selectCategoryIds.length === 0){
+            setSortProduct(products);
+        } else {
+            setSortProduct(products.filter((product) => selectCategoryIds.includes(product.categoryId)))
+        }
+    }
+
+    const selectCategory = (selectCategory, selectCategoryIds) => {
+        setSelectCategoryIds(selectCategory === 'All' ? [] : selectCategoryIds)
+    }
 
     return (
         <div>
             <h1></h1>
-            Selected shopProductId: {selectedShopProduct}
+            Selected shopProductId: <ul>{selectShopProduct.map((shopProductId)=>(
+                <li key={shopProductId}>{shopProductId}</li>
+            ))}
+            </ul>
             <form onSubmit={Connection}>
             <div>
-                <label htmlFor="category_selected">
-                Sort by Category
-                </label>
-                <select 
-                        id="category_selected"
-                        value={selectCategory}
-                        onChange={(e)=>setSelectCategory(e.target.value)}
-                    >
-                        <option value='' disabled>Select Category</option>
-                        <option value='All'>All</option>
-                        {categories.map(category=>(
-                            <option key={category._id} value={category._id}>
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
+                <CategoryTree onSelectCategory={selectCategory}/>
             </div>
 
                 <div>
