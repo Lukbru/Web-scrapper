@@ -50,7 +50,10 @@ async function CheckMongoDB(data, collectionName) { //TODO CHANGE THE NAMES
           link: item.link,
           shopId: item.shopId,
           name: item.name,
-          createdAt: item.createdAt
+          categoryId: item.categoryId
+        },
+        $setOnInsert:{
+          createdAt: product.createdAt
         }
       };
 
@@ -157,11 +160,21 @@ async function upsertShopProduct(product) {
         link: product.link, 
         shopId: product.shopId,
         name: product.name,
+        categoryId: product.categoryId
+      },
+      $setOnInsert:{
         createdAt: product.createdAt
       }
     };
 
     const dbShopProduct = await collection.findOneAndUpdate({ sourceId: product.SourceID }, update, { upsert: true });
+    console.log(dbShopProduct);
+    
+    if (dbShopProduct.upsertedCount > 0) {
+      console.log('Data updated to MongoDB');
+    } else {
+      console.log('Data already exist in MongoDB');
+    }
     return dbShopProduct._id.toString();
   }
   catch (error) {
@@ -188,4 +201,4 @@ async function randomDelay(max, min){
   return Math.floor(Math.random()* (max - min + 1) + min);
 }
 
-module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName,randomDelay }
+module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName,randomDelay}

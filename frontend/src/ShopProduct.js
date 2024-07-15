@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import CategoryTree from './CategoryTree';
 
 function displayShopProducts(ShopProducts, loading, error, selectShopProduct, checkBoxShoProduct) {
     if (loading || error) {
@@ -44,6 +45,7 @@ function Product() {
     const [selectShopB, setSelectShopB] = useState('');
     const [connectedProduct, setConnectedProduct] = useState('All');
     const [selectShopProduct, setSelectShopProduct]= useState([]);
+    const [selectCategoryIds, setSelectCategoryIds] = useState('');
     
     const fetchShop_products = async () => {
         try {
@@ -81,8 +83,8 @@ function Product() {
         fetch_shops();
     }, []);
 
-    const filterProductsA = ShopProduct.filter(shopProduct => shopProduct.shopId === selectShopA);
-    const filterProductsB = ShopProduct.filter(shopProduct => shopProduct.shopId === selectShopB);
+    const filterProductsA = ShopProduct.filter(shopProduct => shopProduct.shopId === selectShopA && (selectCategoryIds.length === 0 || selectCategoryIds.includes(shopProduct.categoryId)));
+    const filterProductsB = ShopProduct.filter(shopProduct => shopProduct.shopId === selectShopB && (selectCategoryIds.length === 0 || selectCategoryIds.includes(shopProduct.categoryId)));
 
     const filterConnected = (ShopProduct, filter) => {
         return ShopProduct.filter(product=>{
@@ -101,11 +103,16 @@ function Product() {
         sessionStorage.setItem('selectShopProduct', JSON.stringify(newShopProductsIds));
     }
 
+    const selectCategory = (selectCategory, selectCategoryIds) => {
+        setSelectCategoryIds(selectCategory === 'All' ? [] : selectCategoryIds)
+    }
+
 return (
     <div>
             <h1>Shop Product List</h1>
             {loading && <p>Loading</p>}
             {error && <p>{error}</p>}
+            <CategoryTree onSelectCategory={selectCategory}/>
         <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <div style={{flex:1}}>
                 <h2>Select Shop</h2>

@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName, randomDelay} = require('./mongoDB.js');
+const { setTimeout } = require('node:timers/promises')
 
 async function ScrapeObi(link,categoryId) {
   const browser = await puppeteer.launch(); 
@@ -12,19 +13,19 @@ async function ScrapeObi(link,categoryId) {
   await page.goto(link);
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
+  let hasNextPage = true;
 
   const createdAt = new Date(); 
+
+  while (hasNextPage){
+    console.log(`Scraping page...`);
+
   const {ProductList, ProductNameList} = await page.evaluate(function (shopId, createdAt, categoryId) { 
     const ProductEvent = document.querySelectorAll('.product.large')
     const ProductList = [];
     const ProductNameList = [];
 
     ProductEvent.forEach(async (ShopProduct) => {
-
-    const ProductTytle = ShopProduct.querySelector('.description');
-    const productName = ProductTytle ? ProductTytle.innerText.trim() : '-';
-
-    ProductNameList.push({ productName, categoryId }); 
 
       const SourceIDNAME = ShopProduct.querySelector('a.product-wrapper.wt_ignore');
       const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
@@ -37,6 +38,8 @@ async function ScrapeObi(link,categoryId) {
 
       const PriceName = ShopProduct.querySelector('.price');
       let priceString = PriceName ? PriceName.innerText.trim() : '-';
+
+      ProductNameList.push({ name, categoryId }); 
 
        // take second value from prices like "629,00 zł\n499,00 zł"
        const combinedPriceStringElements = priceString.split('\n');
@@ -68,7 +71,7 @@ async function ScrapeObi(link,categoryId) {
         const part = href.split('/');
         const SourceID = part[part.length - 1];
 
-        ProductList.push({product: { link, SourceID, shopId, name, createdAt }, price: {price: parsedPrice, createdAt}});
+        ProductList.push({product: { link, SourceID, shopId, name, createdAt, categoryId }, price: {price: parsedPrice, createdAt}});
 
       }
     });
@@ -91,13 +94,28 @@ async function ScrapeObi(link,categoryId) {
     return Shop;
   });
 
-  await CheckMongoDB(ProductList, 'ShopProduct');
-  console.log(ProductList);
+  // await CheckMongoDB(ProductList, 'ShopProduct');
+  // console.log(ProductList);
   await SaveProduct(ProductNameList, 'Products');
   console.log(ProductNameList);
-  await sleep(randomDelay(5000, 22000));
+  await sleep(randomDelay(22000, 8000));
   await SaveName(Shop, 'Shops');
   console.log(Shop); 
+
+  hasNextPage = await page.evaluate(()=>{
+    const nextPage = document.querySelector('button.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
+    if (nextPage){
+      nextPage.click();
+      return true;
+    } else {
+      return false;
+    }
+  })
+
+  if (hasNextPage){
+    await setTimeout(10000);
+  }
+}
 
   await browser.close();
 };
