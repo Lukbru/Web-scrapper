@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName,randomDelay } = require('./mongoDB.js');
+const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName,randomDelay, saveDetail } = require('./mongoDB.js');
 const { setTimeout } = require('node:timers/promises')
 
 async function ScrapeCastorama (link,categoryId) {
@@ -54,13 +54,13 @@ async function ScrapeCastorama (link,categoryId) {
   
         if (href) {
           const part = href.split('/');
-          let SourceID = part[part.length - 1];
+          let sourceId = part[part.length - 1];
 
-          if (SourceID.endsWith('_CAPL.prd')) {
-            SourceID = SourceID.replace('_CAPL.prd', '');
+          if (sourceId.endsWith('_CAPL.prd')) {
+            sourceId = sourceId.replace('_CAPL.prd', '');
         }
   
-        ProductList.push({product: { link, SourceID, shopId, name, createdAt, categoryId}, price: {price, createdAt}});
+        ProductList.push({product: { link, sourceId, shopId, name, createdAt, categoryId}, price: {price, createdAt}});
         }
       });
       return {ProductList,ProductNameList};
@@ -90,8 +90,28 @@ async function ScrapeCastorama (link,categoryId) {
     await SaveName(Shop, 'Shops');
     console.log(Shop); 
 
+    for (const productDesc of ProductList){
+      const productLink = productDesc.product.link;
+      const sourceId = productDesc.product.sourceId;
+      const shopId = productDesc.product.shopId;
+      await page.goto(productLink);
+      const description = await page.evaluate(() => {
+        const descriptionA = document.querySelector('.ccb9d67a._17d3fa36._4fd271c8._49e8bd5b.cc6bbaee')
+        details = descriptionA ? descriptionA.innerText.trim().replace(/\n/g, ' ') : null;
+
+        const ImageSRC = document.querySelector('._2fc6e0e9.b4d87c1d._78f9416e._4076e307.ce5065a9');
+        const imageUrl = ImageSRC ? ImageSRC.src : null;
+
+        return { details, imageUrl }
+      });
+      const shopProductDetails = {shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
+      await saveDetail([shopProductDetails], 'ShopProduct')
+      console.log(shopProductDetails);
+    await setTimeout(4000);
+ }
+
     currentPage++;
-    await setTimeout(10000);
+    await setTimeout(8000);
   }
     await browser.close();
   };

@@ -143,7 +143,9 @@ client.connect().then(() => {
         shopId: shopProduct.shopId,
         name: shopProduct.name,
         link: shopProduct.link,
-        prices: groupedShopsProductPrices[shopProduct._id.toString()] 
+        prices: groupedShopsProductPrices[shopProduct._id.toString()],
+        description: shopProduct.description,
+        imageUrl: shopProduct.imageUrl 
       }))
     });
    });

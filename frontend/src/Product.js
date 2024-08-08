@@ -9,6 +9,9 @@ function Product() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectCategoryIds, setSelectCategoryIds] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [searchFilter, setSearchFilter] = useState('');
+
 
     const fetchProducts = async () => {
         try {
@@ -34,6 +37,10 @@ function Product() {
         filtrProducts();
     }, [selectCategoryIds, products]);
 
+    useEffect(()=>{
+        filtrProductsBySearch();
+    }, [searchFilter, sortProduct]);
+
     const filtrProducts = () => {
         if (selectCategoryIds.length === 0){
             setSortProduct(products);
@@ -46,10 +53,25 @@ function Product() {
         setSelectCategoryIds(selectCategory === 'All' ? [] : selectCategoryIds)
     }
 
+    const filtrProductsBySearch = () => {
+        if (searchFilter === ''){
+            setFilteredProducts(sortProduct);
+        } else {
+            setFilteredProducts(sortProduct.filter((products)=>
+                products.name.toLowerCase().includes(searchFilter.toLowerCase())
+        ));
+        }
+    }
+
+    const checkSearch = (product) => {
+        setSearchFilter(product.target.value);
+    }
+
     return (
         <div>
             <h1>Product List:</h1>
              <CategoryTree onSelectCategory={selectCategory}/>
+             <p>Search Bar:  <input type='text' placeholder='Search for Products' value={searchFilter} onChange={checkSearch}/></p>
              {/* <select
             id ="categories"
             value={SelectCategory}
@@ -65,7 +87,7 @@ function Product() {
             {loading && <p>Loading</p>}
             {error && <p>{error}</p>}
             <ul>
-                {sortProduct.map((products)=>(
+                {filteredProducts.map((products)=>(
                     <li key={products._id}>
                         <h2>{products.name}</h2>
                         <button>

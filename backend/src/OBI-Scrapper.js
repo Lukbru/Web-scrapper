@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName, randomDelay} = require('./mongoDB.js');
+const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName, randomDelay, saveDetail} = require('./mongoDB.js');
 const { setTimeout } = require('node:timers/promises')
 
 async function ScrapeObi(link,categoryId) {
@@ -14,6 +14,7 @@ async function ScrapeObi(link,categoryId) {
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
   let hasNextPage = true;
+  let productInfo = [];
 
   const createdAt = new Date(); 
 
@@ -69,14 +70,16 @@ async function ScrapeObi(link,categoryId) {
 
       if (href) {
         const part = href.split('/');
-        const SourceID = part[part.length - 1];
+        const sourceId = part[part.length - 1];
 
-        ProductList.push({product: { link, SourceID, shopId, name, createdAt, categoryId }, price: {price: parsedPrice, createdAt}});
+        ProductList.push({product: { link, sourceId, shopId, name, createdAt, categoryId }, price: {price: parsedPrice, createdAt}});
 
       }
     });
     return {ProductList, ProductNameList};
   }, shopId, createdAt, categoryId);
+
+  productInfo.push(...ProductList);
 
   await Promise.all(ProductList.map( async(data) => {
     const shopProductId = await upsertShopProduct(data.product);
@@ -113,8 +116,28 @@ async function ScrapeObi(link,categoryId) {
   })
 
   if (hasNextPage){
-    await setTimeout(10000);
+    await setTimeout(8000);
   }
+}
+
+for (const productDesc of productInfo){
+  const productLink = productDesc.product.link;
+  const sourceId = productDesc.product.sourceId;
+  const shopId = productDesc.product.shopId;
+  await page.goto(productLink);
+  const description = await page.evaluate(() => {
+    const descriptionA = document.querySelector('.overview__detail-list.normal.black')
+    details = descriptionA ? descriptionA.innerText.trim().replace(/\n/g, ' ') : null;
+
+    const ImageSRC = document.querySelector('.ads-slider__image.ads-slider__sm-image.jqzoom');
+    const imageUrl = ImageSRC ? ImageSRC.src : null;
+
+    return { details, imageUrl }
+  });
+  const shopProductDetails = {shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
+  await saveDetail([shopProductDetails], 'ShopProduct')
+  console.log(shopProductDetails);
+await setTimeout(4000);
 }
 
   await browser.close();

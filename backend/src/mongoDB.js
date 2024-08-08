@@ -156,7 +156,7 @@ async function upsertShopProduct(product) {
   try {
     const update = {
       $set: {
-        sourceId: product.SourceID,
+        sourceId: product.sourceId,
         link: product.link, 
         shopId: product.shopId,
         name: product.name,
@@ -167,7 +167,7 @@ async function upsertShopProduct(product) {
       }
     };
 
-    const dbShopProduct = await collection.findOneAndUpdate({ sourceId: product.SourceID }, update, { upsert: true });
+    const dbShopProduct = await collection.findOneAndUpdate({ sourceId: product.sourceId }, update, { upsert: true });
     console.log(dbShopProduct);
     
     if (dbShopProduct.upsertedCount > 0) {
@@ -192,6 +192,38 @@ async function findShopByName(shopName) {
   return shop;
 }
 
+async function saveDetail(data, collectionName){
+  const database = client.db('mydatabase');
+  const collection = database.collection(collectionName);
+  const options = { upsert: true };
+
+  for (const item of data) {
+    try {
+      const log = {
+        shopId: item.shopId,
+        sourceId: item.sourceId
+      };
+      const update = {
+        $set: {
+          sourceId: item.sourceId,
+          description: item.description,
+          imageUrl : item.imageUrl
+      }
+      };
+
+      const collectionA = await collection.updateOne(log, update, options);
+      if (collectionA.upsertedCount > 0) {
+        console.log('Description added to MongoDB');
+      } else {
+        console.log('Description already exist in MongoDB');
+      }
+    }
+    catch (error) {
+      console.error('Error - please try again later ?');
+    }
+  }
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms)); // Czeka dany czas
@@ -201,4 +233,4 @@ async function randomDelay(max, min){
   return Math.floor(Math.random()* (max - min + 1) + min);
 }
 
-module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName,randomDelay}
+module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName,randomDelay, saveDetail}

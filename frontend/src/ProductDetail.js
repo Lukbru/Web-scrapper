@@ -27,6 +27,40 @@ ChartJS.register(
     Legend
   );
 
+const styles = {
+    detailsBox :{
+        display: 'flex',
+        border: '1px solid #ccc',
+        padding: '10px',
+        alignItems: 'center',
+        flexDirection: 'row',
+        marginRight: '40px',
+        marginLeft: '40px'
+    },
+    image :{
+        maxWidth : '200px',
+        marginRight: '10px'
+    },
+    mainImage:{
+        maxWidth : '220px',
+        marginRight: '10px',
+        border: '1px solid grey',
+    },
+    textBox :{
+        felx: '1'
+    },
+    shopImage :{
+        maxWidth : '200px',
+    }
+}
+
+const Shop_Images = {
+ '6626adc5a5b15d56ea2cb5dc' : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRW22XHQS1aQPPMghJ1k9Q9dlk2aSyUZn2PuQ&s',
+ '66255aee1b80af46d117b52b' : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLZVumRI75Ki1B0EF_d4SYUV6psLVxsAy-HA&s'
+}
+
+const PlaceHolder_Image = 'https://t4.ftcdn.net/jpg/05/17/53/57/360_F_517535712_q7f9QC9X6TQxWi6xYZZbMmw5cnLMr279.jpg'
+
 function ProductDetail(){
     const { productId } = useParams();
     const [product, setProduct] = useState(null);
@@ -36,7 +70,7 @@ function ProductDetail(){
     const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), new Date().getMonth()));
     const [endDate, setEndDate] = useState(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0));
 
-    const fetchProductsAndPrices = async () => {
+    const fetchProducts = async () => {
         try {
             const response = await axios.get(`http://localhost:3000/products/${productId}`);
             const shopsResponse = await axios.get(`http://localhost:3000/shops`);
@@ -65,7 +99,7 @@ function ProductDetail(){
     }
 
     useEffect(() => {
-        fetchProductsAndPrices();
+        fetchProducts();
     }, [productId]);
 
     function renderVariants() {
@@ -119,6 +153,34 @@ function ProductDetail(){
     );
 }
 
+function LoadDetails(){
+    if (loading) {
+        return;
+    }
+    return product.shopProducts.map(shopProduct=>(
+        <div style={styles.detailsBox}>
+            {Shop_Images[shopProduct.shopId] && (
+                <img src={Shop_Images[shopProduct.shopId]} style={styles.shopImage}/>
+            )}
+            {shopProduct.imageUrl && <img src={shopProduct.imageUrl} style={styles.image}/>}
+            <p style={styles.textBox}>Opis : {shopProduct.description}</p>
+        </div>
+    ));
+}
+
+function MainDetails(){
+    const mainShopProduct = product.shopProducts.find(Url => Url.imageUrl || Shop_Images[Url.shopId]);
+    const mainImageUrl = mainShopProduct ? (mainShopProduct.imageUrl || Shop_Images[mainShopProduct.shopId]) : PlaceHolder_Image;
+    const mainDescription = mainShopProduct ? mainShopProduct.description : "No description";
+
+    return(
+        <div style={styles.detailsBox}>
+            <img src={mainImageUrl} style={styles.mainImage}/>
+            <p><h2>{product.name}</h2> {mainDescription}</p>
+        </div>
+    );
+}
+
     return (
         <div>
             <h1>Product Detail: </h1>
@@ -128,9 +190,9 @@ function ProductDetail(){
                 <div>
                     <h2>Product Name: {product.name}</h2>
                     <p>Details: </p>
-                    <ul>
-                        {renderVariants()}
-                    </ul>
+                    {MainDetails()}
+                    <ul>{LoadDetails()}</ul>
+                    <ul>{renderVariants()}</ul>
                 </div>
             )}
         </div>
