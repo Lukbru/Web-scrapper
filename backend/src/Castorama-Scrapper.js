@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName,randomDelay, saveDetail } = require('./mongoDB.js');
+const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName,randomDelay, saveDetail, CheckDetails } = require('./mongoDB.js');
 const { setTimeout } = require('node:timers/promises')
 
 async function ScrapeCastorama (link,categoryId) {
@@ -40,7 +40,7 @@ async function ScrapeCastorama (link,categoryId) {
         const href = SourceIDNAME ? SourceIDNAME.getAttribute('href') : '-';
   
         const LinkName = ShopProduct.querySelector('._64ca4dc5._66091259');
-        const link = LinkName ? LinkName.href : '-';
+        const link = LinkName ? LinkName.href : null;
   
         const TitleName = ShopProduct.querySelector('.ccb9d67a');
         const name = TitleName ? TitleName.innerText.trim() : '-';
@@ -94,6 +94,9 @@ async function ScrapeCastorama (link,categoryId) {
       const productLink = productDesc.product.link;
       const sourceId = productDesc.product.sourceId;
       const shopId = productDesc.product.shopId;
+      const detailsExists = await CheckDetails(shopId, sourceId);
+      if (!detailsExists){
+      console.log(`Scrapping ${productLink} for details...`)
       await page.goto(productLink);
       const description = await page.evaluate(() => {
         const descriptionA = document.querySelector('.ccb9d67a._17d3fa36._4fd271c8._49e8bd5b.cc6bbaee')
@@ -108,7 +111,10 @@ async function ScrapeCastorama (link,categoryId) {
       await saveDetail([shopProductDetails], 'ShopProduct')
       console.log(shopProductDetails);
     await setTimeout(4000);
+ } else {
+  console.log(`Details exists for ${sourceId}...`)
  }
+}
 
     currentPage++;
     await setTimeout(8000);

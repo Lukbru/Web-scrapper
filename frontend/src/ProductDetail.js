@@ -39,10 +39,12 @@ const styles = {
     },
     image :{
         maxWidth : '200px',
+        maxHeight : '200px',
         marginRight: '10px'
     },
     mainImage:{
         maxWidth : '220px',
+        maxHeight : '220px',
         marginRight: '10px',
         border: '1px solid grey',
     },
@@ -111,13 +113,14 @@ function ProductDetail(){
             return {
                 label:shops[shopProduct.shopId],
                 data: filterPricesByDate(shopProduct.prices).map(priceData=> ({
-                    x: new Date(priceData.createdAt),
+                    x: new Date((new Date(priceData.createdAt)).setHours(0, 0, 0, 0)),
                     y: priceData.price
                 })),
                 borderColor: RandomColor()
             }});
         
-        const labels= [...new Set(datasets.flatMap(shopProduct=>shopProduct.data.map(priceData=> priceData.x.toLocaleDateString())))];
+        const maxDate = new Date (Math.max(...datasets.flatMap(shopProduct=>shopProduct.data.map(priceData=> priceData.x.toLocaleDateString()))));
+        const minDate = new Date (Math.min(...datasets.flatMap(shopProduct=>shopProduct.data.map(priceData=> priceData.x.toLocaleDateString()))));
 
   return (
     <div>Shops
@@ -141,11 +144,24 @@ function ProductDetail(){
         </div>
         <div style={{width: "80%", display: 'flex', justifyContent: 'center'}}>
                 <Line data={{
-                     labels,
                      datasets 
                      }}  
                  options={{
                 responsive: true,
+                scales:{
+                    x:{
+                        type:'time',
+                        time: {
+                            unit:'day',
+                            tooltipFormat:"d.MM.yyyy"
+                        },
+                    min: minDate,
+                    max: maxDate,
+                    },
+                    y:{
+                        beginAtZero:"true"
+                    }
+                }
                    }}
               />
           </div>
@@ -169,9 +185,11 @@ function LoadDetails(){
 }
 
 function MainDetails(){
-    const mainShopProduct = product.shopProducts.find(Url => Url.imageUrl || Shop_Images[Url.shopId]);
-    const mainImageUrl = mainShopProduct ? (mainShopProduct.imageUrl || Shop_Images[mainShopProduct.shopId]) : PlaceHolder_Image;
-    const mainDescription = mainShopProduct ? mainShopProduct.description : "No description";
+    const mainObi = product.shopProducts.find(Url => shops[Url.shopId] === 'OBI');
+    const mainCastorama = product.shopProducts.find(Url =>  shops[Url.shopId] === 'Castorama');
+
+    const mainImageUrl = mainObi?.imageUrl || mainCastorama?.imageUrl || PlaceHolder_Image; // Checks Obi then Castorama for image
+    const mainDescription = mainObi?.description || mainCastorama?.description || "No description";
 
     return(
         <div style={styles.detailsBox}>

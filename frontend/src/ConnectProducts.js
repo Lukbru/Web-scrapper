@@ -12,6 +12,7 @@ function ConnectProducts() {
     const [selectCategoryIds, setSelectCategoryIds] = useState('');
     const [sortProduct, setSortProduct] = useState([]);
     const [selectShopProduct, setSelectShopProduct]= useState([]);
+    const [searchFilter, setSearchFilter] = useState('');
 
     useEffect(()=>{
         const storedSelectedShopProduct = sessionStorage.getItem('selectShopProduct')
@@ -59,7 +60,7 @@ function ConnectProducts() {
 
     useEffect(() => {
         filtrProducts();
-    }, [selectCategoryIds, products]);
+    }, [selectCategoryIds, products, searchFilter]);
 
     const filtrProducts = () => {
         if (selectCategoryIds.length === 0){
@@ -73,6 +74,15 @@ function ConnectProducts() {
         setSelectCategoryIds(selectCategory === 'All' ? [] : selectCategoryIds)
     }
 
+    const filtrProductsBySearch = () => {
+        if (searchFilter === ''){
+            return sortProduct;
+        } else {
+            return sortProduct.filter(product => product.name.toLowerCase().includes(searchFilter.toLowerCase())
+        );
+        }
+    }
+
     return (
         <div>
             <h1></h1>
@@ -83,6 +93,9 @@ function ConnectProducts() {
             <form onSubmit={Connection}>
             <div>
                 <CategoryTree onSelectCategory={selectCategory}/>
+            </div>
+            <div>
+                <p>Search Bar:  <input type='text' placeholder='Search for Products' value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)}/></p>
             </div>
 
                 <div>
@@ -96,7 +109,7 @@ function ConnectProducts() {
                         required
                     >
                         <option value='' disabled>Select Product</option>
-                        {sortProduct.map(product => (
+                        {filtrProductsBySearch().map(product => (
                             <option key={product._id} value={product._id}>
                                 {product.name} 
                             </option> 

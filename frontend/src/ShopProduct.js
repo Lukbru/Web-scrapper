@@ -46,6 +46,7 @@ function Product() {
     const [connectedProduct, setConnectedProduct] = useState('All');
     const [selectShopProduct, setSelectShopProduct]= useState([]);
     const [selectCategoryIds, setSelectCategoryIds] = useState('');
+    const [searchFilter, setSearchFilter] = useState('');
     
     const fetchShop_products = async () => {
         try {
@@ -83,8 +84,26 @@ function Product() {
         fetch_shops();
     }, []);
 
-    const filterProductsA = ShopProduct.filter(shopProduct => shopProduct.shopId === selectShopA && (selectCategoryIds.length === 0 || selectCategoryIds.includes(shopProduct.categoryId)));
-    const filterProductsB = ShopProduct.filter(shopProduct => shopProduct.shopId === selectShopB && (selectCategoryIds.length === 0 || selectCategoryIds.includes(shopProduct.categoryId)));
+    const filtrProductsBySearch = (shopProducts) => {
+        if (searchFilter === ''){
+            return shopProducts;
+        } else {
+            return shopProducts.filter((shopProduct)=>
+               shopProduct.name && shopProduct.name.toLowerCase().includes(searchFilter.toLowerCase())
+        );
+        }
+    }
+
+    const checkSearch = (shopProduct) => {
+        setSearchFilter(shopProduct.target.value);
+    }
+
+    const filtrByShopId_CategoryId = (shopProducts, shopId) => {
+        return shopProducts.filter((shopProduct) => shopProduct.shopId === shopId && (selectCategoryIds.length === 0 || selectCategoryIds.includes(shopProduct.categoryId)));
+    }
+
+    const filterProductsA = filtrProductsBySearch(filtrByShopId_CategoryId(ShopProduct, selectShopA));
+    const filterProductsB = filtrProductsBySearch(filtrByShopId_CategoryId(ShopProduct, selectShopB));
 
     const filterConnected = (ShopProduct, filter) => {
         return ShopProduct.filter(product=>{
@@ -113,6 +132,7 @@ return (
             {loading && <p>Loading</p>}
             {error && <p>{error}</p>}
             <CategoryTree onSelectCategory={selectCategory}/>
+            <p>Search Bar:  <input type='text' placeholder='Search for Products' value={searchFilter} onChange={checkSearch}/></p>
         <div style={{display: 'flex', justifyContent: 'space-between'}}>
             <div style={{flex:1}}>
                 <h2>Select Shop</h2>

@@ -167,7 +167,7 @@ async function upsertShopProduct(product) {
       }
     };
 
-    const dbShopProduct = await collection.findOneAndUpdate({ sourceId: product.sourceId }, update, { upsert: true });
+    const dbShopProduct = await collection.findOneAndUpdate({ sourceId: product.sourceId }, update, { upsert: true, returnDocument: 'after' });
     console.log(dbShopProduct);
     
     if (dbShopProduct.upsertedCount > 0) {
@@ -213,15 +213,23 @@ async function saveDetail(data, collectionName){
 
       const collectionA = await collection.updateOne(log, update, options);
       if (collectionA.upsertedCount > 0) {
-        console.log('Description added to MongoDB');
-      } else {
         console.log('Description already exist in MongoDB');
+      } else {
+        console.log('Description added to MongoDB');
       }
     }
     catch (error) {
       console.error('Error - please try again later ?');
     }
   }
+}
+
+async function CheckDetails(shopId, sourceId) {
+  const database = client.db('mydatabase');
+  const collection = database.collection('ShopProduct');
+
+  const product = await collection.findOne({shopId:shopId, sourceId:sourceId, description: { $exists:true }, imageUrl: { $exists:true }});
+  return !!product;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -233,4 +241,4 @@ async function randomDelay(max, min){
   return Math.floor(Math.random()* (max - min + 1) + min);
 }
 
-module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName,randomDelay, saveDetail}
+module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName,randomDelay, saveDetail, CheckDetails}

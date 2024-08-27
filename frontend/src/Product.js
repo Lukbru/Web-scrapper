@@ -13,16 +13,26 @@ function Product() {
     const [searchFilter, setSearchFilter] = useState('');
 
 
-    const fetchProducts = async () => {
+    const fetchConnectedProducts = async () => {
         try {
-            const response = await axios.get('http://localhost:3000/products');
+            const productResponse = await axios.get('http://localhost:3000/products');
 
-            if (response.status !== 200) {
+            if (productResponse.status !== 200) {
                 throw new error('Error - please try again later')
             }
 
+            const shopProductResponse = await axios.get('http://localhost:3000/shopproduct');
+
+            if (shopProductResponse.status !== 200) {
+                throw new error('Error - please try again later')
+            }
+
+            const connectedProductIds = shopProductResponse.data.filter(shopProduct => shopProduct.productId).map(shopProduct => shopProduct.productId);
+
+            const connectedProducts = productResponse.data.filter(product => connectedProductIds.includes(product._id));
+
             setLoading(false);
-            setProducts(response.data);
+            setProducts(connectedProducts);
         } catch (error) {
             setError('Failed to load products');
             setLoading(false);
@@ -30,7 +40,7 @@ function Product() {
     };
 
     useEffect(() => {
-        fetchProducts();
+        fetchConnectedProducts();
     }, []);
 
     useEffect(() => {
