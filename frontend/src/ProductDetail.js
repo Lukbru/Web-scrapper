@@ -40,7 +40,8 @@ const styles = {
     image :{
         maxWidth : '200px',
         maxHeight : '200px',
-        marginRight: '10px'
+        marginRight: '30px',
+        marginLeft: '10px'
     },
     mainImage:{
         maxWidth : '220px',
@@ -173,15 +174,20 @@ function LoadDetails(){
     if (loading) {
         return;
     }
-    return product.shopProducts.map(shopProduct=>(
+    return product.shopProducts.map((shopProduct)=> {
+        const newestPrice = shopProduct.prices.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+
+        return (
         <div style={styles.detailsBox}>
             {Shop_Images[shopProduct.shopId] && (
                 <img src={Shop_Images[shopProduct.shopId]} style={styles.shopImage}/>
             )}
             {shopProduct.imageUrl && <img src={shopProduct.imageUrl} style={styles.image}/>}
-            <p style={styles.textBox}>Opis : {shopProduct.description}</p>
+            <p style={styles.textBox}>{shopProduct.description}</p>
+            <p style={styles.detailsBox}>Current Price : {newestPrice.price}</p>
+            <p><a href={shopProduct.link}><button>Go to Shop</button></a></p>
         </div>
-    ));
+    )});
 }
 
 function MainDetails(){
