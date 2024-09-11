@@ -207,13 +207,11 @@ function MainDetails(){
 
     return (
         <div>
-            <h1>Product Detail: </h1>
             {loading && <p>Loading</p>}
             {error && <p>{error}</p>}
             { product && (
                 <div>
                     <h2>Product Name: {product.name}</h2>
-                    <p>Details: </p>
                     {MainDetails()}
                     <ul>{LoadDetails()}</ul>
                     <ul>{renderVariants()}</ul>

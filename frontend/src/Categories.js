@@ -153,7 +153,7 @@ function Product() {
                     <button type="submit">Add Category</button></form></div>
             {loading && <p>Loading...</p>}
             {error && <p>{error}</p>}
-            <div>
+            {/* <div>
                 <select 
                 id='selectProduct'
                 value={selectProduct}
@@ -179,7 +179,7 @@ function Product() {
                     ))}
                 </select>
                 <button onClick={ChangeCategory}>Change Category</button>
-            </div>
+            </div> */}
 
         </div>
     );
