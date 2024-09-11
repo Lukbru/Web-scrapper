@@ -31,7 +31,7 @@ async function startScrapper() {
     const links = await scrapperCollection.find().toArray();
 
     for (const link of links){
-        await scrapperCron(link, link.categoryId, link.shopId)
+        await scrapperCron(link.link, link.categoryId, link.shopId)
     }} catch (error) {
         console.error('Error :', error)
     } finally {
