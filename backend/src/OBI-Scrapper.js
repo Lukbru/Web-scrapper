@@ -12,6 +12,7 @@ async function ScrapeObi(link, categoryId) {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0'
   })
 
+  console.log(link)
   await page.goto(link);
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
