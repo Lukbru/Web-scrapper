@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { MongoClient } = require('mongodb');
-const { ScrapeCastorama } = require('../backend/src/Castorama-Scrapper');
-const { ScrapeObi } = require('../backend/src/OBI-Scrapper');
+const { ScrapeCastorama } = require('./Castorama-Scrapper');
+const { ScrapeObi } = require('./OBI-Scrapper');
 
 const uri = "mongodb+srv://bruzdalukasz1c:evsPCoHvQN7TERdZ@scrap.mez5fky.mongodb.net/?retryWrites=true&w=majority&appName=Scrap";
 
