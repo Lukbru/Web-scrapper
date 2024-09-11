@@ -43,5 +43,3 @@ cron.schedule('12 12 * * *', () => {
     console.log('Running scheduled scrapper...');
     startScrapper();
 });
-
-startScrapper();
