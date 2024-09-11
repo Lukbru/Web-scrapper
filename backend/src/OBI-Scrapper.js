@@ -3,7 +3,9 @@ const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection, savePric
 const { setTimeout } = require('node:timers/promises')
 
 async function ScrapeObi(link, categoryId) {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
   const page = await browser.newPage();
 
   page.setExtraHTTPHeaders({

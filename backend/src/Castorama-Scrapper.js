@@ -3,7 +3,9 @@ const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePric
 const { setTimeout } = require('node:timers/promises')
 
 async function ScrapeCastorama (link,categoryId) {
-    const browser = await puppeteer.launch();   //({ headless : false }) - pokazuje nam  ze otwiera przegladarke
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });   //({ headless : false }) - pokazuje nam  ze otwiera przegladarke
     const page = await browser.newPage();
 
     page.setExtraHTTPHeaders({
