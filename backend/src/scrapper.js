@@ -14,6 +14,7 @@ const client = new MongoClient(uri, {
 });
 
 async function scrapperCron(link, categoryId, shopId){
+    console.log("shopid", shopId)
     if (shopId === '6626adc5a5b15d56ea2cb5dc'){
         await ScrapeObi(link, categoryId);
     } else if (shopId === '66255aee1b80af46d117b52b'){
@@ -30,12 +31,13 @@ async function startScrapper() {
     const scrapperCollection = database.collection('Scrapper');
     const links = await scrapperCollection.find().toArray();
 
+    //const shopId = '6626adc5a5b15d56ea2cb5dc';
     for (const link of links){
         await scrapperCron(link, categoryId, shopId)
     }} catch (error) {
         console.error('Error :', error)
     } finally {
-        await client.close
+        await client.close();
     }
 }
 
