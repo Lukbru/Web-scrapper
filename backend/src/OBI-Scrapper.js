@@ -152,9 +152,12 @@ async function ScrapeObi(link, categoryId) {
     await saveDetail([shopProductDetails], 'ShopProduct')
     console.log(shopProductDetails);
     await setTimeout(4000);
+
   }
 
   await browser.close();
+
+  return productInfo.length;
 };
 
 module.exports = { ScrapeObi }

@@ -16,6 +16,7 @@ async function ScrapeCastorama (link,categoryId) {
     const shopId = shop._id.toString();
     let hasNextPage = true;
     let currentPage = 1;
+    let productInfo = [];
     const createdAt = new Date(); 
     
   while (hasNextPage){
@@ -68,6 +69,8 @@ async function ScrapeCastorama (link,categoryId) {
       });
       return {ProductList,ProductNameList};
     }, shopId, createdAt, categoryId);
+
+    productInfo.push(...ProductList);
 
     await Promise.all(ProductList.map( async(data) => {
       const shopProductId = await upsertShopProduct(data.product);
@@ -123,6 +126,8 @@ async function ScrapeCastorama (link,categoryId) {
     await setTimeout(8000);
   }
     await browser.close();
+
+    return productInfo.length;
   };
 
 module.exports={ScrapeCastorama}

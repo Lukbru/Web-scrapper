@@ -17,14 +17,15 @@ const client = new MongoClient(uri, {
 
 let logger;
 
-
 async function scrapperCron(link, categoryId, shopId){
+    let productCount = 0;
+
     if (shopId === '6626adc5a5b15d56ea2cb5dc'){
-        logger.info(`Scrapping : ${link}`)
-        await ScrapeObi(link, categoryId);
+        productCount = await ScrapeObi(link, categoryId);
+        logger.info(`Products scrapped : ${productCount} from link : ${link}`)
     } else if (shopId === '66255aee1b80af46d117b52b'){
-        logger.info(`Scrapping : ${link}`)
-        await ScrapeCastorama(link, categoryId);
+        productCount = await ScrapeCastorama(link, categoryId);
+        logger.info(`Products scrapped : ${productCount} from link : ${link}`)
     } else {
         logger.info(`No shop found for this Id : ${shopId}`)
     }
@@ -41,6 +42,7 @@ async function startScrapper() {
         ),
         transports: [
             new winston.transports.File({ filename: 'scrapper.log'}),
+            new winston.transports.Console(),
             new winston.transports.MongoDB({collection: 'logs',  db: await Promise.resolve(client)})
         ]
     });
@@ -52,15 +54,14 @@ async function startScrapper() {
     for (const link of links){
         await scrapperCron(link.link, link.categoryId, link.shopId)
     }} catch (error) {
-        console.error('Error :', error)
+        logger.error('Error :', error)
     } finally {
         await client.close();
     }
 }
 
 cron.schedule('10 12 * * *', () => {
-    console.log('Running scheduled scrapper...');
+    logger.info('Running scheduled scrapper...');
     startScrapper();
 });
 
-startScrapper();
