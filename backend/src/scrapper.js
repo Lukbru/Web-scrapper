@@ -23,7 +23,7 @@ const logger = winston.createLogger({
     ),
     transports: [
         new winston.transports.File({ filename: 'scrapper.log'}),
-        new winston.transports.MongoDB({collection: 'logs'})
+        new winston.transports.MongoDB({collection: 'logs',  db: await Promise.resolve(client)})
     ]
 });
 
