@@ -15,17 +15,8 @@ const client = new MongoClient(uri, {
   }
 });
 
-const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json()
-    ),
-    transports: [
-        new winston.transports.File({ filename: 'scrapper.log'}),
-        new winston.transports.MongoDB({collection: 'logs',  db: await Promise.resolve(client)})
-    ]
-});
+let logger;
+
 
 async function scrapperCron(link, categoryId, shopId){
     if (shopId === '6626adc5a5b15d56ea2cb5dc'){
@@ -42,6 +33,18 @@ async function scrapperCron(link, categoryId, shopId){
 async function startScrapper() {
     try {
     await client.connect();
+    logger = winston.createLogger({
+        level: 'info',
+        format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.json()
+        ),
+        transports: [
+            new winston.transports.File({ filename: 'scrapper.log'}),
+            new winston.transports.MongoDB({collection: 'logs',  db: await Promise.resolve(client)})
+        ]
+    });
+
     const database = client.db('mydatabase');
     const scrapperCollection = database.collection('Scrapper');
     const links = await scrapperCollection.find().toArray();
