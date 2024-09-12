@@ -241,4 +241,17 @@ async function randomDelay(max, min){
   return Math.floor(Math.random()* (max - min + 1) + min);
 }
 
-module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName,randomDelay, saveDetail, CheckDetails}
+async function retry (promiseFactory, retrycount) {
+  try {
+    return await promiseFactory();
+  } catch (error) {
+    if (retrycount <= 0){
+      throw error
+    }
+    console.log(`Retrying... ${retrycount}`); 
+    return await retry(promiseFactory, retrycount-1);
+  }
+}
+
+
+module.exports = { saveToMongoDB, CheckMongoDB, sleep, SaveName,SaveProduct, saveToCollection, savePrice, upsertShopProduct, findShopByName,randomDelay, saveDetail, CheckDetails, retry}

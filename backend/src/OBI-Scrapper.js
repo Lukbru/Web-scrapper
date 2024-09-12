@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection, savePrice, upsertShopProduct, SaveProduct, findShopByName, randomDelay, saveDetail, CheckDetails } = require('./mongoDB.js');
+const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection, savePrice, upsertShopProduct, SaveProduct, findShopByName, randomDelay, saveDetail, CheckDetails, retry } = require('./mongoDB.js');
 const { setTimeout } = require('node:timers/promises')
 
 async function ScrapeObi(link, categoryId) {
@@ -13,7 +13,8 @@ async function ScrapeObi(link, categoryId) {
   })
 
   console.log(link)
-  await page.goto(link);
+  await retry(() => page.goto(link),2);
+
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
   let hasNextPage = true;

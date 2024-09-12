@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName,randomDelay, saveDetail, CheckDetails } = require('./mongoDB.js');
+const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName,randomDelay, saveDetail, CheckDetails, retry } = require('./mongoDB.js');
 const { setTimeout } = require('node:timers/promises')
 
 async function ScrapeCastorama (link,categoryId) {
@@ -21,7 +21,8 @@ async function ScrapeCastorama (link,categoryId) {
   while (hasNextPage){
     const url = `${link}?page=${currentPage}`;
     console.log(`Scraping page ${url}...`);
-    await page.goto(url);
+
+    await retry(() => page.goto(url),2);
 
     const noResult = await page.evaluate(()=>{
       return document.querySelectorAll('._64ca4dc5._66091259').length === 0;
