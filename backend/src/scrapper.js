@@ -65,3 +65,4 @@ cron.schedule('38 12 * * *', async () => {
     startScrapper();
 });
 
+startScrapper();
