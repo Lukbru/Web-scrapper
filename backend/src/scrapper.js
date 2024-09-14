@@ -56,11 +56,13 @@ async function startScrapper() {
     }} catch (error) {
         logger.error('Error :', error)
     } finally {
+        console.log('Closing');
         await client.close();
+        console.log('Closed');
     }
 }
 
-cron.schedule('43 12 * * *', async () => {
+cron.schedule('30 12 * * *', async () => {
+    //logger.info('Running scheduled scrapper...');
     startScrapper();
 });
-
