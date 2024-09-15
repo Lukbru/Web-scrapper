@@ -62,7 +62,7 @@ async function startScrapper() {
     }
 }
 
-cron.schedule('30 12 * * *', async () => {
+cron.schedule('52 14 * * *', async () => {
     //logger.info('Running scheduled scrapper...');
     startScrapper();
 });

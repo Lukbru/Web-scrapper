@@ -13,7 +13,7 @@ async function ScrapeObi(link, categoryId) {
   })
 
   console.log(link)
-  await retry(() => page.goto(link),2);
+  await retry(() => page.goto(link),5);
 
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
