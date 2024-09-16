@@ -55,12 +55,16 @@ async function startScrapper() {
         await scrapperCron(link.link, link.categoryId, link.shopId)
     }} catch (error) {
         logger.error('Error :', error)
-    } finally {
-        console.log('Closing');
         await client.close();
-        console.log('Closed');
+    } finally {
+        console.log('Client Closed');
     }
 }
+
+process.on('exit', exitHandler.bind(null,{cleanup:true}));
+process.on('SIGINT', exitHandler.bind(null, {exit:true}));
+process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
+process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
 cron.schedule('20 12 * * *', async () => {
     //logger.info('Running scheduled scrapper...');
