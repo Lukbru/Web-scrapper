@@ -16,7 +16,6 @@ const client = new MongoClient(uri, {
 });
 
 let logger;
-await client.connect();
 
 async function scrapperCron(link, categoryId, shopId){
     let productCount = 0;
@@ -67,6 +66,10 @@ function exitHandler(options, exitCode) {
     if (options.exit) process.exit();
 }
 
+async function start() {
+    await client.connect();
+}
+
 process.on('exit', exitHandler.bind(null,{cleanup:true}));
 process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
@@ -76,3 +79,5 @@ cron.schedule('20 12 * * *', async () => {
     //logger.info('Running scheduled scrapper...');
     startScrapper();
 });
+
+start();
