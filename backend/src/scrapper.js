@@ -16,6 +16,7 @@ const client = new MongoClient(uri, {
 });
 
 let logger;
+await client.connect();
 
 async function scrapperCron(link, categoryId, shopId){
     let productCount = 0;
@@ -33,7 +34,6 @@ async function scrapperCron(link, categoryId, shopId){
 
 async function startScrapper() {
     try {
-    await client.connect();
     logger = winston.createLogger({
         level: 'info',
         format: winston.format.combine(
