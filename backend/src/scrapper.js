@@ -56,7 +56,7 @@ async function startScrapper() {
         logger.error('Error :', error)
         await client.close();
     } finally {
-        console.log('Client Closed');
+        console.log('Scrapping Ended');
     }
 }
 

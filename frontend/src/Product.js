@@ -77,11 +77,14 @@ function Product() {
         setSearchFilter(product.target.value);
     }
 
+    const productCount = filteredProducts.length;
+
     return (
         <div>
             <h1>Product List:</h1>
              <CategoryTree onSelectCategory={selectCategory}/>
              <p>Search Bar:  <input type='text' placeholder='Search for Products' value={searchFilter} onChange={checkSearch}/></p>
+             <p>Total Products: {productCount}</p>
              {/* <select
             id ="categories"
             value={SelectCategory}

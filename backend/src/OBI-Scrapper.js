@@ -110,11 +110,17 @@ async function ScrapeObi(link, categoryId) {
     console.log(Shop); 
 
     hasNextPage = await page.evaluate(() => {
-      const nextPage = document.querySelector('button.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
-      if (nextPage) {
-        nextPage.click();
+      const nextPageButton = document.querySelector('button.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
+      if (nextPageButton) {
+        nextPageButton.click();
         return true;
-      } else {
+      } 
+      const nextPageLink = document.querySelector('a.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
+      if (nextPageLink) {
+        nextPageLink.click();
+        return true;
+      } 
+      else {
         return false;
       }
     })
