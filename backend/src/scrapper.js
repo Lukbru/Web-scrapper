@@ -29,9 +29,12 @@ async function scrapperCron(link, categoryId, shopId){
     } else {
         logger.info(`No shop found for this Id : ${shopId}`)
     }
+
+    return productCount;
 }
 
 async function startScrapper() {
+    const scrapeLogger = {};
     try {
     logger = winston.createLogger({
         level: 'info',
@@ -51,8 +54,25 @@ async function startScrapper() {
     const links = await scrapperCollection.find().toArray();
 
     for (const link of links){
-        await scrapperCron(link.link, link.categoryId, link.shopId)
-    }} catch (error) {
+       const productCount = await scrapperCron(link.link, link.categoryId, link.shopId)
+
+       if (!scrapeLogger[link.categoryId]) {
+        scrapeLogger[link.categoryId] = 0;
+       }
+       scrapeLogger[link.categoryId] += productCount;
+    }
+
+    for (const [categoryId, productCount] of Object.entries(scrapeLogger)) {
+        logger.info(`Scrapped ${productCount} products from category: ${categoryId}`)
+    }
+
+    const totalCategories = Object.keys(scrapeLogger).length;
+    const totalProducts = Object.values(scrapeLogger).reduce((sum, count) => sum + count, 0)
+
+    logger.info(`Scrapping completed : Total products scrapped - ${totalProducts} from ${totalCategories} categories`)
+
+
+} catch (error) {
         logger.error('Error :', error)
         await client.close();
     } finally {
@@ -75,7 +95,7 @@ process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
-cron.schedule('20 12 * * *', async () => {
+cron.schedule('04 17 * * *', async () => {
     //logger.info('Running scheduled scrapper...');
     startScrapper();
 });
