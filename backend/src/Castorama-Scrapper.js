@@ -116,14 +116,14 @@ async function ScrapeCastorama (link,categoryId) {
       const shopProductDetails = {shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
       await saveDetail([shopProductDetails], 'ShopProduct')
       console.log(shopProductDetails);
-    await setTimeout(4000);
+    await setTimeout(6000);
  } else {
   console.log(`Details exists for ${sourceId}...`)
  }
 }
 
     currentPage++;
-    await setTimeout(8000);
+    await setTimeout(12000);
   }
     await browser.close();
 
