@@ -15,6 +15,17 @@ const client = new MongoClient(uri, {
   }
 });
 
+async function getCategoryName(categoryId) {
+        const database = client.db('mydatebase');
+        const categoryCollection = database.collection('Categories');
+        const category = await categoryCollection.findOne({ _id: categoryId });
+
+        if (category){
+            return category.name;
+        }
+        return 'Unknown Category';
+}
+
 let logger;
 
 async function scrapperCron(link, categoryId, shopId){
@@ -63,7 +74,8 @@ async function startScrapper() {
     }
 
     for (const [categoryId, productCount] of Object.entries(scrapeLogger)) {
-        logger.info(`Scrapped ${productCount} products from category: ${categoryId}`)
+        const categoryName = await getCategoryName(categoryId);
+        logger.info(`Scrapped ${productCount} products from category: ${categoryName}`)
     }
 
     const totalCategories = Object.keys(scrapeLogger).length;
