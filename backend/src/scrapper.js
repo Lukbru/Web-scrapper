@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const winston = require('winston');
 require('winston-mongodb');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { ObjectId, MongoClient, ServerApiVersion } = require('mongodb');
 const { ScrapeCastorama } = require('./Castorama-Scrapper');
 const { ScrapeObi } = require('./OBI-Scrapper');
 
@@ -18,7 +18,7 @@ const client = new MongoClient(uri, {
 async function getCategoryName(categoryId) {
         const database = client.db('mydatebase');
         const categoryCollection = database.collection('Categories');
-        const category = await categoryCollection.findOne({ _id: categoryId });
+        const category = await categoryCollection.findOne({ _id: ObjectId(categoryId) });
 
         if (category){
             return category.name;
@@ -107,7 +107,7 @@ process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
-cron.schedule('20 12 * * *', async () => {
+cron.schedule('37 13 * * *', async () => {
     //logger.info('Running scheduled scrapper...');
     startScrapper();
 });
