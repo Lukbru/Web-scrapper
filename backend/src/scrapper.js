@@ -16,9 +16,8 @@ const client = new MongoClient(uri, {
 });
 
 async function getCategoryName(categoryId) {
-        const database = client.db('mydatebase');
+        const database = client.db('mydatabase');
         const categoryCollection = database.collection('Categories');
-        console.log(categoryId);
         const category = await categoryCollection.findOne({ _id: new ObjectId(categoryId) });
 
         if (category){
@@ -108,7 +107,7 @@ process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
-cron.schedule('41 16 * * *', async () => {
+cron.schedule('19 17 * * *', async () => {
     //logger.info('Running scheduled scrapper...');
     startScrapper();
 });
