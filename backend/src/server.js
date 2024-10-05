@@ -33,6 +33,14 @@ client.connect().then(() => {
   const productPrice_collection = db.collection('ShopProductPrice');
   const scrapper_collection = db.collection('Scrapper');
 
+  const test = client.db('test');
+  const logs_collection = test.collection('logs');
+
+  app.get('/logs', async (req, res) => {
+    const logs = await logs_collection.find().toArray();
+    res.json(logs);
+  });
+
   app.get('/shops', async (req, res) => {
     const shops = await shops_collection.find().toArray();
     res.json(shops.map(shop => ({ 

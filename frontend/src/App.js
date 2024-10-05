@@ -6,6 +6,7 @@ import ConnectProducts from './ConnectProducts';
 import ProductDetail from './ProductDetail';
 import Categories from './Categories';
 import Scrapper from './Scrapper';
+import Logs from './Logs';
 
 function App() {
   const navbar={
@@ -38,6 +39,9 @@ function App() {
         <Link to = './Scrapper' style={linkboxes}>Scrapper</Link>
       </li>
       <li style={menuboxes}>
+        <Link to = './Logs' style={linkboxes}>Logs</Link>
+      </li>
+      <li style={menuboxes}>
         <Link to = './' style={linkboxes}>Product</Link>
       </li>
       </nav>
@@ -54,6 +58,8 @@ function App() {
         <Route path="/Categories" element={<Categories />} />
 
         <Route path="/Scrapper" element={<Scrapper />} />
+
+        <Route path="/Logs" element={<Logs />} />
 
         <Route path="/ConnectProducts/:shopProductId" element={<ConnectProducts />} />
 

@@ -11,6 +11,8 @@ function Product() {
     const [selectCategoryIds, setSelectCategoryIds] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [searchFilter, setSearchFilter] = useState('');
+    const [bothShopsOnly, setBothShopsOnly] = useState(false);
+    const [shopProducts, setShopProducts] = useState([]);
 
 
     const fetchConnectedProducts = async () => {
@@ -27,12 +29,13 @@ function Product() {
                 throw new error('Error - please try again later')
             }
 
-            const connectedProductIds = shopProductResponse.data.filter(shopProduct => shopProduct.productId).map(shopProduct => shopProduct.productId);
+            // const connectedProductIds = shopProductResponse.data.filter(shopProduct => shopProduct.productId).map(shopProduct => shopProduct.productId);
 
-            const connectedProducts = productResponse.data.filter(product => connectedProductIds.includes(product._id));
+            // const connectedProducts = productResponse.data.filter(product => connectedProductIds.includes(product._id));
 
             setLoading(false);
-            setProducts(connectedProducts);
+            setProducts(productResponse.data);
+            setShopProducts(shopProductResponse.data)
         } catch (error) {
             setError('Failed to load products');
             setLoading(false);
@@ -45,18 +48,27 @@ function Product() {
 
     useEffect(() => {
         filtrProducts();
-    }, [selectCategoryIds, products]);
+    }, [selectCategoryIds, products, bothShopsOnly]);
 
     useEffect(()=>{
         filtrProductsBySearch();
     }, [searchFilter, sortProduct]);
 
     const filtrProducts = () => {
-        if (selectCategoryIds.length === 0){
-            setSortProduct(products);
-        } else {
-            setSortProduct(products.filter((product) => selectCategoryIds.includes(product.categoryId)))
+
+        const connectedProductIds = shopProducts.map(shopProduct => shopProduct.productId);
+        let filtered = products.filter((product) => connectedProductIds.includes(product._id));
+        if (selectCategoryIds.length > 0){
+            filtered = filtered.filter((product) => selectCategoryIds.includes(product.categoryId));
+        } 
+        if (bothShopsOnly) {
+            const productsBothShops = products.filter((product) => { 
+                const shopsWithProduct = shopProducts.filter(shopProduct => shopProduct.productId === product._id);
+                return shopsWithProduct.length > 1;
+            });
+            filtered = filtered.filter((product) => productsBothShops.includes(product));
         }
+        setSortProduct(filtered);
     }
 
     const selectCategory = (selectCategory, selectCategoryIds) => {
@@ -79,24 +91,17 @@ function Product() {
 
     const productCount = filteredProducts.length;
 
+    const buttonBothShopsOnly = () => {
+        setBothShopsOnly(!bothShopsOnly);
+    }
+
     return (
         <div>
             <h1>Product List:</h1>
              <CategoryTree onSelectCategory={selectCategory}/>
              <p>Search Bar:  <input type='text' placeholder='Search for Products' value={searchFilter} onChange={checkSearch}/></p>
+             <p>Show only products aviable in both shops : <input type='checkbox' checked={bothShopsOnly} onChange={buttonBothShopsOnly}/></p>
              <p>Total Products: {productCount}</p>
-             {/* <select
-            id ="categories"
-            value={SelectCategory}
-            onChange={(e)=>setSelectCategory(e.target.value)}
-            >
-                <option value="All">All</option>
-                {category.map((category)=>(
-                    <option key={category._id} value={category._id}>
-                        {category.name}
-                    </option>
-                ))}
-            </select> */}
             {loading && <p>Loading</p>}
             {error && <p>{error}</p>}
             <ul>
