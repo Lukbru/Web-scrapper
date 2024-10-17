@@ -126,7 +126,7 @@ async function ScrapeObi(link, categoryId) {
     })
 
     if (hasNextPage) {
-      await setTimeout(8000);
+      await setTimeout(10000);
     }
   }
 
@@ -157,7 +157,7 @@ async function ScrapeObi(link, categoryId) {
     const shopProductDetails = { shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
     await saveDetail([shopProductDetails], 'ShopProduct')
     console.log(shopProductDetails);
-    await setTimeout(4000);
+    await setTimeout(6000);
 
   }
 
