@@ -23,7 +23,7 @@ async function ScrapeCastorama (link,categoryId) {
     const url = `${link}?page=${currentPage}`;
     console.log(`Scraping page ${url}...`);
 
-    await retry(() => page.goto(url),14);
+    await retry(() => page.goto(url),15);
 
     const noResult = await page.evaluate(()=>{
       return document.querySelectorAll('._64ca4dc5._66091259').length === 0;
@@ -123,7 +123,7 @@ async function ScrapeCastorama (link,categoryId) {
 }
 
     currentPage++;
-    await setTimeout(15000);
+    await setTimeout(14000);
   }
     await browser.close();
 

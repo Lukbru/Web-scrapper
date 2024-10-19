@@ -249,6 +249,7 @@ async function retry (promiseFactory, retrycount) {
       throw error
     }
     console.log(`Retrying... ${retrycount}`); 
+    await sleep(12000);
     return await retry(promiseFactory, retrycount-1);
   }
 }
