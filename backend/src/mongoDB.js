@@ -241,16 +241,16 @@ async function randomDelay(max, min){
   return Math.floor(Math.random()* (max - min + 1) + min);
 }
 
-async function retry (promiseFactory, retrycount) {
+async function retry (url, retrycount) {
   try {
-    return await promiseFactory();
+    return await url();
   } catch (error) {
     if (retrycount <= 0){
       throw error
     }
     console.log(`Retrying... ${retrycount}`); 
-    await sleep(12000);
-    return await retry(promiseFactory, retrycount-1);
+    await sleep(36000);
+    return await retry(url, retrycount-1);
   }
 }
 
