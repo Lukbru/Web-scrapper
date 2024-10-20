@@ -123,7 +123,7 @@ async function ScrapeCastorama (link,categoryId) {
 }
 
     currentPage++;
-    await setTimeout(14000);
+    await setTimeout(16000);
   }
     await browser.close();
 
