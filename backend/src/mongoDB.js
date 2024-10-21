@@ -238,7 +238,8 @@ function sleep(ms) {
 }
 
 async function randomDelay(max, min){
-  return Math.floor(Math.random()* (max - min + 1) + min);
+  const delay = Math.floor(Math.random()* (max - min + 1) + min);
+  return sleep(delay)
 }
 
 async function retry (url, retrycount) {
@@ -249,7 +250,7 @@ async function retry (url, retrycount) {
       throw error
     }
     console.log(`Retrying... ${retrycount}`); 
-    await sleep(36000);
+    await sleep(6000);
     return await retry(url, retrycount-1);
   }
 }

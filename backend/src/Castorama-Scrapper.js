@@ -92,7 +92,7 @@ async function ScrapeCastorama (link,categoryId) {
     // console.log(ProductList);
     await SaveProduct(ProductNameList, 'Products');
     console.log(ProductNameList);
-    await sleep(randomDelay(22000, 8000));
+    await sleep(8000);
     await SaveName(Shop, 'Shops');
     console.log(Shop); 
 
@@ -116,14 +116,15 @@ async function ScrapeCastorama (link,categoryId) {
       const shopProductDetails = {shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
       await saveDetail([shopProductDetails], 'ShopProduct')
       console.log(shopProductDetails);
-    await setTimeout(52000);
+    await setTimeout(12000);
  } else {
   console.log(`Details exists for ${sourceId}...`)
  }
 }
 
     currentPage++;
-    await setTimeout(56000);
+    
+    await randomDelay(16000, 30000);
   }
     await browser.close();
 

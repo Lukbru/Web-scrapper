@@ -105,7 +105,7 @@ async function ScrapeObi(link, categoryId) {
     // console.log(ProductList);
     await SaveProduct(ProductNameList, 'Products');
     console.log(ProductNameList);
-    await sleep(randomDelay(22000, 8000));
+    await sleep(8000);
     await SaveName(Shop, 'Shops');
     console.log(Shop); 
 
@@ -126,7 +126,7 @@ async function ScrapeObi(link, categoryId) {
     })
 
     if (hasNextPage) {
-      await setTimeout(10000);
+      await sleep(6000);
     }
   }
 
@@ -157,7 +157,7 @@ async function ScrapeObi(link, categoryId) {
     const shopProductDetails = { shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
     await saveDetail([shopProductDetails], 'ShopProduct')
     console.log(shopProductDetails);
-    await setTimeout(56000);
+    await sleep(6000);
 
   }
 
