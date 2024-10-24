@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.css';
 
 function Product() {
     const [loading, setLoading] = useState(true);
@@ -98,14 +99,16 @@ function Product() {
             }
         }
 
-        return <ol>{firstLevelCategories.map((firstLevelCategory) =>
-            <li key={firstLevelCategory._id}>
-                {firstLevelCategory.name}
-                <ol>
-                    {(secondLevelCategoriesMap[firstLevelCategory._id] ?? []).map(secondLevelCategory => <li key={secondLevelCategory._id}>
+        return (
+        <ol className='list-group list-group-numbered'>
+            {firstLevelCategories.map((firstLevelCategory) =>(
+            <li key={firstLevelCategory._id} className='list-group-item list-group-item-secondary'>
+                <strong>{firstLevelCategory.name}</strong>
+                <ol className='list-group ms-4 list-group-numbered'>
+                    {(secondLevelCategoriesMap[firstLevelCategory._id] ?? []).map(secondLevelCategory => <li key={secondLevelCategory._id} className='list-group-item mt-2 list-group-item-dark'>
                         {secondLevelCategory.name}
-                        <ol>
-                            {(thirdLevelCategoriesMap[secondLevelCategory._id] ?? []).map(thirdLevelCategory => <li key={thirdLevelCategory._id}>
+                        <ol className='list-group ms-4 '>
+                            {(thirdLevelCategoriesMap[secondLevelCategory._id] ?? []).map(thirdLevelCategory => <li key={thirdLevelCategory._id} className='list-group-item mt-2 list-group-item-light'>
                                 {thirdLevelCategory.name}
                             </li>)}
                         </ol>
@@ -113,33 +116,38 @@ function Product() {
                     )}
                 </ol>
             </li>
-        )}
-        </ol>
+        ))}
+        </ol>)
     }
 
     return (
-        <div>
-            <h1>Category:</h1>
-            <label htmlFor='categoryselect'>Category: </label>
+        <div className='container mt-5'>
+            <h1 className='text-center mb-4'>Category</h1>
             {displayCategoriesTree()}
-            <div>
-                <form onSubmit={addCategory}>
+            <div className='mt-3'>
+                <form onSubmit={addCategory} className='row g-2'>
+                    <div className='col-md-4'>
                     <input
+                        className='form-control'
                         type='text'
                         value={newCategory.name}
                         onChange={(e) => setnewCategory({ ...newCategory, name: e.target.value })}
                         placeholder='Add new Category'
                         required
-                    />
+                    /></div>
+                    <div className='col-md-2'>
                     <input
+                        className='form-control'
                         type='number'
                         value={newCategory.level}
                         onChange={(e) => setnewCategory({ ...newCategory, level: parseInt(e.target.value) })}
                         placeholder='Add Category Level'
                         required
-                    />
+                    /></div>
                     {newCategory.level > 1 && (
+                        <div className='col-md-4'>
                         <select
+                            className='form-select'
                             value={newCategory.parentCategoryId}
                             onChange={(e) => setnewCategory({ ...newCategory, parentCategoryId: e.target.value })}
                             required>
@@ -149,38 +157,12 @@ function Product() {
                                 </option>
                             )}
                         </select>
+                        </div>
                     )}
-                    <button type="submit">Add Category</button></form></div>
+                    <div className='col-md-2'>
+                    <button type="submit" className='btn btn-secondary mb-2'>Add Category</button></div></form></div>
             {loading && <p>Loading...</p>}
             {error && <p>{error}</p>}
-            {/* <div>
-                <select 
-                id='selectProduct'
-                value={selectProduct}
-                onChange={(e)=> setSelectProduct(e.target.value)}
-                >
-                    <option value=''>Select Product</option>
-                    {products.map((product)=>(
-                        <option key={product._id} value={product._id}>
-                            {product.name}
-                        </option>
-                    ))}
-                </select>
-                <select 
-                id='selectCategory'
-                value={selectCategory}
-                onChange={(e)=> setSelectCategory(e.target.value)}
-                >
-                    <option value=''>Select Category</option>
-                    {categories.map((category)=>(
-                        <option key={category._id} value={category._id}>
-                            {category.name}
-                        </option>
-                    ))}
-                </select>
-                <button onClick={ChangeCategory}>Change Category</button>
-            </div> */}
-
         </div>
     );
 }

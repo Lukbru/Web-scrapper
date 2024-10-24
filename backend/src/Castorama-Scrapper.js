@@ -26,7 +26,7 @@ async function ScrapeCastorama (link,categoryId) {
     await retry(() => page.goto(url),15);
 
     const noResult = await page.evaluate(()=>{
-      return document.querySelectorAll('._64ca4dc5._66091259').length === 0;
+      return document.querySelectorAll('._64ca4dc5._66091259').length < 1;
     });
 
     if (noResult) {

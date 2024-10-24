@@ -14,6 +14,7 @@ function App() {
     top: 0,
     width: '100%',
     backgroundColor: 'grey',
+    zIndex: 100,
   };
   const linkboxes={
     display: 'inline-block',
