@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CategoryTree from './CategoryTree';
+import 'bootstrap/dist/css/bootstrap.css';
 
 function Product() {
     const [products, setProducts] = useState([]);
@@ -96,24 +97,36 @@ function Product() {
     }
 
     return (
-        <div>
-            <h1>Product List:</h1>
-             <CategoryTree onSelectCategory={selectCategory}/>
-             <p>Search Bar:  <input type='text' placeholder='Search for Products' value={searchFilter} onChange={checkSearch}/></p>
-             <p>Show only products aviable in both shops : <input type='checkbox' checked={bothShopsOnly} onChange={buttonBothShopsOnly}/></p>
-             <p>Total Products: {productCount}</p>
+        <div className='container mt-4'>
+            <h1 className='text-center mb-4'>Product List</h1>
+            <div className='row mb-3'>
+                <div className='col-md-5'>
+             <p>Search Bar:  <input className='form-control' type='text' placeholder='Search for Products' value={searchFilter} onChange={checkSearch}/></p>
+                </div>
+                <div className='col-md-3'>
+                <CategoryTree onSelectCategory={selectCategory}/>
+                </div>
+             <div className='col-md-4 d-flex align-items-end'>
+                <div className='form-check form-switch'>
+             <p>Show only products aviable in both shops <input className='form-check-input' type='checkbox' checked={bothShopsOnly} onChange={buttonBothShopsOnly}/></p>
+             </div>
+             </div>
+             </div>
+             <p className='text-primary'>Total Products: {productCount}</p>
             {loading && <p>Loading</p>}
             {error && <p>{error}</p>}
-            <ul>
+            <div className='row'>
                 {filteredProducts.map((products)=>(
-                    <li key={products._id}>
-                        <h2>{products.name}</h2>
-                        <button>
-                        <Link to={`/products/${products._id}`}>Product details</Link>
-                        </button>
-                    </li>
+                    <div key={products._id} className='col-md-4 mb-3'>
+                        <div className='card border-dark h-100 shadow-sm'>
+                            <div className='card-body text-center'>
+                        <h5 className='card-title'>{products.name}</h5>
+                        <Link to={`/products/${products._id}`} className='btn btn-secondary mt-3'>Product details</Link>
+                        </div>
+                        </div>
+                    </div>
                 ))}
-            </ul>
+            </div>
         </div>
     );
 }

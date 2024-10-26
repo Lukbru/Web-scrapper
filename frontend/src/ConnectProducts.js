@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import CategoryTree from './CategoryTree';
+import 'bootstrap/dist/css/bootstrap.css';
 
 function ConnectProducts() {
     const [loading, setLoading] = useState(true);
@@ -84,25 +85,27 @@ function ConnectProducts() {
     }
 
     return (
-        <div>
-            <h1></h1>
-            Selected shopProductId: <ul>{selectShopProduct.map((shopProductId)=>(
-                <li key={shopProductId}>{shopProductId}</li>
+        <div className='container mt-4'>
+            <h1 className='text-center mb-3'>Connect Products</h1>
+            <h5>Selected shopProductId:</h5> 
+            <ul className='list-group' >{selectShopProduct.map((shopProductId)=>(
+                <li key={shopProductId} className='list-group-item'>{shopProductId}</li>
             ))}
             </ul>
-            <form onSubmit={Connection}>
-            <div>
+            <form onSubmit={Connection} className='bg-light p-4 shadow rounded'>
+            <div className='mb-3'>
                 <CategoryTree onSelectCategory={selectCategory}/>
             </div>
-            <div>
-                <p>Search Bar:  <input type='text' placeholder='Search for Products' value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)}/></p>
+            <div className='mb-3'>
+                <p>Search Bar:  <input className='form-control' type='text' placeholder='Search for Products' value={searchFilter} onChange={(e) => setSearchFilter(e.target.value)}/></p>
             </div>
 
-                <div>
+                <div className='mb-3'>
                     <label htmlFor="product_selected">
-                        Select Product
+                        Select Product:
                     </label>
                     <select
+                        className='form-select'
                         id="product_selected"
                         value={selectedProduct}
                         onChange={(e) => setSelectedProduct(e.target.value)}
@@ -116,7 +119,7 @@ function ConnectProducts() {
                         ))}
                     </select>
                 </div>
-                <button type="submit">Connect</button>
+                <button type="submit" className='btn btn-primary w-100'>Connect</button>
             </form>
 
             {status}

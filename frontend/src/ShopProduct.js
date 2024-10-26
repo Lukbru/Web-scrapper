@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import CategoryTree from './CategoryTree';
+import 'bootstrap/dist/css/bootstrap.css';
 
 function displayShopProducts(ShopProducts, loading, error, selectShopProduct, checkBoxShoProduct) {
     if (loading || error) {
@@ -11,25 +12,30 @@ function displayShopProducts(ShopProducts, loading, error, selectShopProduct, ch
     return (
         <ul>
             {ShopProducts.map((ShopProduct) =>
-                <li key={ShopProduct._id}>
-                    <h2>{ShopProduct.name}</h2>
+                <li key={ShopProduct._id} className='card shadow p-3 mb-4'>
+                    <div className='card-body'>
+                    <h4 className='card-title'>{ShopProduct.name}</h4>
                     <p>Link: <a href={ShopProduct.link} target="_blank" rel="noopener noreferrer">{ShopProduct.link}</a></p>
                     <p>Shop ID: {ShopProduct.shopId}</p>
                     <p>Source ID: {ShopProduct.sourceId}</p>
                     <p>Name: {ShopProduct.name}</p>
                     <p>Data: {ShopProduct.createdAt}</p>
-                    <p>Product Id: 
+                    <div className='d-flex justify-content-between mt-3'>
+                        <div className='align-items-center'>
                     < input 
                         type='checkbox'
+                        className='form-check-input me-2'
                         checked={selectShopProduct.includes(ShopProduct._id)}
                         onChange={()=> checkBoxShoProduct(ShopProduct._id)}
                            />{
-                        ShopProduct.productId ?
-                            ShopProduct.productId :
-                            <button>
-                                <Link to={`/ConnectProducts/${ShopProduct._id}`}>Połącz z produktem</Link>
-                            </button>}
-                    </p>
+                        ShopProduct.productId ? (
+                           <label>Product ID: {ShopProduct.productId} </label> ) : (
+                            <label>No Product Id</label>
+                           )}
+                            </div>
+                           {!ShopProduct.productId && ( <Link to={`/ConnectProducts/${ShopProduct._id}`} className='btn btn-primary'>Połącz z produktem</Link>)}
+                           </div>
+                           </div>
                 </li>
             )}
         </ul>
@@ -114,9 +120,6 @@ function Product() {
     }
 
     const checkBoxShoProduct = (shopProductId) => {
-        // setSelectShopProduct(shopProducts=>0
-        //     shopProducts.includes(shopProductId) ? shopProducts.filter(id => id !== shopProductId) : [...shopProducts, shopProductId]
-        // );
         const newShopProductsIds = selectShopProduct.includes(shopProductId) ? selectShopProduct.filter(id => id !== shopProductId) : [...selectShopProduct, shopProductId]
         setSelectShopProduct(newShopProductsIds);
         sessionStorage.setItem('selectShopProduct', JSON.stringify(newShopProductsIds));
@@ -127,45 +130,56 @@ function Product() {
     }
 
 return (
-    <div>
-            <h1>Shop Product List</h1>
+    <div className='container mt-4'>
+            <h1 className='text-center mb-4'>Shop Product List</h1>
             {loading && <p>Loading</p>}
             {error && <p>{error}</p>}
+            <div className='row mb-3'>
+            <div className='col-md-9'>
+            <p>Search Bar:  <input type='text' className='form-control' placeholder='Search for Products' value={searchFilter} onChange={checkSearch}/></p>
+                </div>
+                <div className='col-md-3'>
             <CategoryTree onSelectCategory={selectCategory}/>
-            <p>Search Bar:  <input type='text' placeholder='Search for Products' value={searchFilter} onChange={checkSearch}/></p>
-        <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <div style={{flex:1}}>
+                </div>
+            </div>
+        <div className='row'>
+            <div className='col-md-6'>
                 <h2>Select Shop</h2>
-                <select id="selectShopA" value={selectShopA} onChange={(e)=> setSelectShopA(e.target.value)}>
+                <div className='d-flex mb-3'>
+                <select id="selectShopA" className='form-select mb-2' value={selectShopA} onChange={(e)=> setSelectShopA(e.target.value)}>
                     <option value=''>None</option>
                     {shop.map((shop=>(
                         <option key={shop.id} value={shop.id}>{shop.name}</option>
                     )))}
                 </select>
-                <select id="connectedProduct" value={connectedProduct} onChange={(e)=> setConnectedProduct(e.target.value)}>
+                <select id="connectedProduct" className='form-select mb-2' value={connectedProduct} onChange={(e)=> setConnectedProduct(e.target.value)}>
                     <option value="All">All</option>
                     <option value="Connected">Connected</option>
                     <option value="Not Connected">Not Connected</option>
                 </select>
+                </div>
                 {displayShopProducts(filterConnected(filterProductsA, connectedProduct), loading, error,selectShopProduct, checkBoxShoProduct)}
             </div>
-            <div style={{flex:1}}>
+            <div className='col-md-6'>
             <h2>Select Shop</h2>
-                <select id="selectShopB" value={selectShopB} onChange={(e)=> setSelectShopB(e.target.value)}>
+            <div className='d-flex mb-3'>
+                <select id="selectShopB" className='form-select mb-2' value={selectShopB} onChange={(e)=> setSelectShopB(e.target.value)}>
                     <option value=''>None</option>
                     {shop.map((shop=>(
                         <option key={shop.id} value={shop.id}>{shop.name}</option>
                     )))}
                 </select>
-                <select id="connectedProduct" value={connectedProduct} onChange={(e)=> setConnectedProduct(e.target.value)}>
+                <select id="connectedProduct" className='form-select mb-2' value={connectedProduct} onChange={(e)=> setConnectedProduct(e.target.value)}>
                     <option value="All">All</option>
                     <option value="Connected">Connected</option>
                     <option value="Not Connected">Not Connected</option>
                 </select>
+                </div>
                 {displayShopProducts(filterConnected(filterProductsB, connectedProduct), loading, error,selectShopProduct, checkBoxShoProduct)}
             </div>
         </div>
     </div>
+    
 );
 }
 
