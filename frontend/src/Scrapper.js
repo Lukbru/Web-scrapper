@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import 'bootstrap/dist/css/bootstrap.css';
 
 function Scrapper() {
     const [loading, setLoading] = useState(true);
@@ -113,18 +113,23 @@ function Scrapper() {
     };
 
     return (
-        <div>
-            <h1>Web Scrapper</h1>
-            <form onSubmit={SaveLinks}>
+        <div className='container mt-4'>
+            <h1 className='text-center mb-4'>Web Scrapper</h1>
+            <form onSubmit={SaveLinks} className='border p-4 rounded shadow-sm bg-light'>
+                <div className='mb-3'>
                 <input
                 type="text"
+                className='form-control'
                 value={scrapper}
                 onChange={(e)=>setScrapper(e.target.value)}
                 placeholder='Space for Link'
                 required
                 /> 
+                </div>
+                <div className='mb-3'>
                 <select 
                 id='selectCategory'
+                className='form-select'
                 value={selectCategory}
                 onChange={(e)=> setSelectCategory(e.target.value)}
                 >
@@ -135,7 +140,10 @@ function Scrapper() {
                         </option>
                     ))}
                 </select>
+                </div>
+                <div className='mb-3'>
                 <select
+                className='form-select'
                 value={selectShop}
                 onChange={(e)=>setSelectShop(e.target.value)}
                 required>
@@ -146,31 +154,37 @@ function Scrapper() {
                         </option>
                     ))}
                 </select>
-                <button type='submit' disabled={error}>
+                </div>
+                <button type='submit' className='btn btn-primary w-100' disabled={error}>
                     {'Add new Scrapper'}
                 </button>
                 </form>
                 {loading && <p>Loading</p>}
                 {error && <p>{error}</p>}
-                <h2>Links thats being Scrapped</h2>
-                <button onClick={selectedAll}>
+                <h2 className='mt-3'>Links thats being Scrapped</h2>
+                <div className='d-flex gap-2 mb-3'>
+                <button className='btn btn-secondary' onClick={selectedAll}>
                     {'Select All'}
                 </button>
-                <button onClick={StartScrapper} disabled={loading}>
+                <button className='btn btn-success' onClick={StartScrapper} disabled={loading}>
                     {'Run Scrapper'}
                 </button>
-                <ul>
+                </div>
+                <ul className='list-group'>
                     {linkScrapper.map(scrap=>(
-                        <li key={scrap._id}>
+                        <li className='list-group-item' key={scrap._id}>
                             <p>
                             < input 
                         type='checkbox'
+                        className='form-check-input me-2'
                         checked={selectScrapper.includes(scrap._id)}
                         onChange={()=> checkBoxScrapper(scrap._id)}
                            />
                             Link : <a href={scrap.link}>{scrap.link}</a></p>
-                            <p>Category : {categories.find(categ=>categ._id === scrap.categoryId)?.name}</p>
-                            <p>Shop : {shops.find(shop=>shop.id === scrap.shopId)?.name}</p>
+                            <div className='mt-1 text-muted'>
+                            Category : {categories.find(categ=>categ._id === scrap.categoryId)?.name} |
+                            Shop : {shops.find(shop=>shop.id === scrap.shopId)?.name}
+                            </div>
                        </li>
                     ))}      
                 </ul>
