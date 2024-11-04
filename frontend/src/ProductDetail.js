@@ -15,6 +15,7 @@ import {
   import { Line } from 'react-chartjs-2'; 
   import DatePicker from 'react-datepicker';
   import 'react-datepicker/dist/react-datepicker.css';
+  import 'bootstrap/dist/css/bootstrap.css';
 
 ChartJS.register(
     CategoryScale,
@@ -34,8 +35,6 @@ const styles = {
         padding: '10px',
         alignItems: 'center',
         flexDirection: 'row',
-        marginRight: '40px',
-        marginLeft: '40px'
     },
     image :{
         maxWidth : '200px',
@@ -54,6 +53,23 @@ const styles = {
     },
     shopImage :{
         maxWidth : '200px',
+    },
+    priceText:{
+        textAlign : 'center',
+        minWidth : '120px',
+        minHeight : '50px',
+        display : 'felx',
+        border: '1px solid #ccc',
+        marginRight: '10px',
+        justifyContent : 'center'
+    },
+    buttonShop:{
+        textAlign : 'center',
+        minWidth : '120px',
+        minHeight : '50px',
+        display : 'felx',
+        marginRight: '10px',
+        justifyContent : 'center'
     }
 }
 
@@ -124,8 +140,8 @@ function ProductDetail(){
         const minDate = new Date (Math.min(...datasets.flatMap(shopProduct=>shopProduct.data.map(priceData=> priceData.x.toLocaleDateString()))));
 
   return (
-    <div>Shops
-        <div style={{ display: 'flex'}}>
+    <div className='mt-3'>Time Range
+        <div className='d-felx mb-3 gat-2'>
         <DatePicker
             selected={startDate}
             onChange={(date)=>setStartDate(date)}
@@ -133,6 +149,7 @@ function ProductDetail(){
             startDate={startDate}
             endDate={endDate}
             dateFormat="d.MM.yyyy"
+            className='form-control'
         />
         <DatePicker
             selected={endDate}
@@ -141,9 +158,10 @@ function ProductDetail(){
             startDate={startDate}
             endDate={endDate}
             dateFormat="d.MM.yyyy"
+            className='form-control'
         />
         </div>
-        <div style={{width: "80%", display: 'flex', justifyContent: 'center'}}>
+        <div className='w-100'>
                 <Line data={{
                      datasets 
                      }}  
@@ -184,8 +202,8 @@ function LoadDetails(){
             )}
             {shopProduct.imageUrl && <img src={shopProduct.imageUrl} style={styles.image}/>}
             <p style={styles.textBox}>{shopProduct.description}</p>
-            <p style={styles.detailsBox}>Current Price : {newestPrice.price}</p>
-            <p><a href={shopProduct.link}><button>Go to Shop</button></a></p>
+            <p style={styles.priceText}>Current Price : {newestPrice.price}</p>
+            <p style={styles.buttonShop}><a href={shopProduct.link} className='btn btn-primary'>Go to Shop</a></p>
         </div>
     )});
 }
@@ -198,22 +216,26 @@ function MainDetails(){
     const mainDescription = mainObi?.description || mainCastorama?.description || "No description";
 
     return(
-        <div style={styles.detailsBox}>
+        <div className='row justify-content-center'> 
+        <div className='col-md-8' style={styles.detailsBox}>
             <img src={mainImageUrl} style={styles.mainImage}/>
             <p><h2>{product.name}</h2> {mainDescription}</p>
+        </div>
         </div>
     );
 }
 
     return (
-        <div>
-            {loading && <p>Loading</p>}
-            {error && <p>{error}</p>}
+        <div className='container mt-4'>
+            {loading && <p className='text-center'>Loading</p>}
+            {error && <p className='text-center'>{error}</p>}
             { product && (
                 <div>
-                    <h2>Product Name: {product.name}</h2>
+                    <h2 className='text-center mb-3'>Product Name: {product.name}</h2>
                     {MainDetails()}
-                    <ul>{LoadDetails()}</ul>
+                    <div className='mb-4'>
+                    <ul className='row'>{LoadDetails()}</ul>
+                    </div>
                     <ul>{renderVariants()}</ul>
                 </div>
             )}
