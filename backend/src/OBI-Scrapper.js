@@ -13,7 +13,7 @@ async function ScrapeObi(link, categoryId) {
   })
 
   console.log(link)
-  await retry(() => page.goto(link),9);
+  await retry(() => page.goto(link),5);
 
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
@@ -126,7 +126,7 @@ async function ScrapeObi(link, categoryId) {
     })
 
     if (hasNextPage) {
-      await randomDelay(16000, 30000);
+      await randomDelay(16000, 34000);
     }
   }
 
@@ -157,7 +157,7 @@ async function ScrapeObi(link, categoryId) {
     const shopProductDetails = { shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
     await saveDetail([shopProductDetails], 'ShopProduct')
     console.log(shopProductDetails);
-    await randomDelay(16000, 30000);
+    await randomDelay(16000, 34000);
 
   }
 

@@ -92,7 +92,6 @@ async function ScrapeCastorama (link,categoryId) {
     // console.log(ProductList);
     await SaveProduct(ProductNameList, 'Products');
     console.log(ProductNameList);
-    await sleep(8000);
     await SaveName(Shop, 'Shops');
     console.log(Shop); 
 
@@ -102,6 +101,10 @@ async function ScrapeCastorama (link,categoryId) {
       const shopId = productDesc.product.shopId;
       const detailsExists = await CheckDetails(shopId, sourceId);
       if (!detailsExists){
+        if (!productLink){
+          console.error("Link doesn't exist");
+          return
+        } else {
       console.log(`Scrapping ${productLink} for details...`)
       await page.goto(productLink);
       const description = await page.evaluate(() => {
@@ -116,15 +119,15 @@ async function ScrapeCastorama (link,categoryId) {
       const shopProductDetails = {shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
       await saveDetail([shopProductDetails], 'ShopProduct')
       console.log(shopProductDetails);
-    await setTimeout(12000);
- } else {
+      await randomDelay(16000, 34000);
+ }} else {
   console.log(`Details exists for ${sourceId}...`)
  }
 }
 
     currentPage++;
     
-    await randomDelay(16000, 30000);
+    await randomDelay(16000, 34000);
   }
     await browser.close();
 
