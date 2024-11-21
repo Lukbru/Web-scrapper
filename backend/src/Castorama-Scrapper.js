@@ -103,6 +103,7 @@ async function ScrapeCastorama (link,categoryId) {
       if (!detailsExists){
         if (!productLink){
           console.error("Link doesn't exist");
+          console.error(productLink);
           return
         } else {
       console.log(`Scrapping ${productLink} for details...`)
