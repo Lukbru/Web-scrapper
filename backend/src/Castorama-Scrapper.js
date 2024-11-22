@@ -104,7 +104,7 @@ async function ScrapeCastorama (link,categoryId) {
         if (!productLink){
           console.error("Link doesn't exist");
           console.error(productLink);
-          return
+          continue;
         } else {
       console.log(`Scrapping ${productLink} for details...`)
       await page.goto(productLink);

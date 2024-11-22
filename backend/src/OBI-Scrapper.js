@@ -126,7 +126,7 @@ async function ScrapeObi(link, categoryId) {
     })
 
     if (hasNextPage) {
-      await randomDelay(16000, 34000);
+      await randomDelay(4000, 9000);
     }
   }
 
@@ -157,7 +157,7 @@ async function ScrapeObi(link, categoryId) {
     const shopProductDetails = { shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
     await saveDetail([shopProductDetails], 'ShopProduct')
     console.log(shopProductDetails);
-    await randomDelay(16000, 34000);
+    await randomDelay(4000, 8000);
 
   }
 
