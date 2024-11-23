@@ -17,6 +17,7 @@ async function ScrapeCastorama (link,categoryId) {
     let hasNextPage = true;
     let currentPage = 1;
     let productInfo = [];
+    let scrapperCount = 0;
     const createdAt = new Date(); 
     
   while (hasNextPage){
@@ -94,8 +95,6 @@ async function ScrapeCastorama (link,categoryId) {
     console.log(ProductNameList);
     await SaveName(Shop, 'Shops');
     console.log(Shop); 
-
-    let scrapperCount = 0;
 
     for (const productDesc of ProductList){
       const productLink = productDesc.product.link;
