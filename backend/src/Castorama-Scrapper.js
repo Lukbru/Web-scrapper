@@ -120,10 +120,11 @@ async function ScrapeCastorama (link,categoryId) {
       });
       const shopProductDetails = {shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
       await saveDetail([shopProductDetails], 'ShopProduct')
-      console.log(shopProductDetails);
       scrapperCount++;
+      console.log(shopProductDetails);
       await randomDelay(16000, 46000);
  }} else {
+  scrapperCount++;
   console.log(`Details exists for ${sourceId}...`)
  }
 }
