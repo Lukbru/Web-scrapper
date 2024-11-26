@@ -8,6 +8,10 @@ async function ScrapeCastorama (link,categoryId) {
     });   //({ headless : false }) - pokazuje nam  ze otwiera przegladarke
     const page = await browser.newPage();
 
+    await page.evaluateOnNewDocument(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+  });
+
     page.setExtraHTTPHeaders({
       'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0'
     })  
@@ -23,6 +27,12 @@ async function ScrapeCastorama (link,categoryId) {
   while (hasNextPage){
     const url = `${link}?page=${currentPage}`;
     console.log(`Scraping page ${url}...`);
+
+    await page.setViewport({
+      width: 1280,
+      height: 800,
+      deviceScaleFactor: 1,
+    });
 
     await retry(() => page.goto(url),17);
 
@@ -122,7 +132,7 @@ async function ScrapeCastorama (link,categoryId) {
       await saveDetail([shopProductDetails], 'ShopProduct')
       scrapperCount++;
       console.log(shopProductDetails);
-      await randomDelay(36000, 86000);
+      await randomDelay(24000, 120000);
  }} else {
   scrapperCount++;
   console.log(`Details exists for ${sourceId}...`)
@@ -131,7 +141,7 @@ async function ScrapeCastorama (link,categoryId) {
 
     currentPage++;
     
-    await randomDelay(36000, 86000);
+    await randomDelay(24000, 120000);
   }
     await browser.close();
 
