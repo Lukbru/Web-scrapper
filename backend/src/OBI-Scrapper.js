@@ -95,14 +95,14 @@ async function ScrapeObi(link, categoryId) {
 
     productInfo.push(...ProductList);
 
-    await Promise.all(ProductList.map( async(data) => {
-      const shopProductId = await upsertShopProduct(data.product);
-      await savePrice({
-        price: data.price.price,
-        shopProductId: shopProductId,
-        createdAt: data.price.createdAt
-      });
-    }))
+    // await Promise.all(ProductList.map( async(data) => {
+    //   const shopProductId = await upsertShopProduct(data.product);
+    //   await savePrice({
+    //     price: data.price.price,
+    //     shopProductId: shopProductId,
+    //     createdAt: data.price.createdAt
+    //   });
+    // }))
 
     const Shop = await page.evaluate(() => {
       const Shop = [];
@@ -113,10 +113,10 @@ async function ScrapeObi(link, categoryId) {
 
     // await CheckMongoDB(ProductList, 'ShopProduct');
     // console.log(ProductList);
-    await SaveProduct(ProductNameList, 'Products');
+    // await SaveProduct(ProductNameList, 'Products');
     console.log(ProductNameList);
     await sleep(8000);
-    await SaveName(Shop, 'Shops');
+    // await SaveName(Shop, 'Shops');
     console.log(Shop); 
 
     hasNextPage = await page.evaluate(() => {
@@ -136,7 +136,7 @@ async function ScrapeObi(link, categoryId) {
     })
 
     if (hasNextPage) {
-      await randomDelay(15000, 30000);
+      await randomDelay(4000, 12000);
     }
   }
 
@@ -167,7 +167,7 @@ async function ScrapeObi(link, categoryId) {
     const shopProductDetails = { shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
     await saveDetail([shopProductDetails], 'ShopProduct')
     console.log(shopProductDetails);
-    await randomDelay(15000, 30000);
+    await randomDelay(4000, 12000);
 
   }
 

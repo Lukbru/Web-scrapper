@@ -1,10 +1,20 @@
 const puppeteer = require('puppeteer');
+const ProxyChain = require('proxy-chain');
 const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection ,savePrice, upsertShopProduct,SaveProduct,findShopByName,randomDelay, saveDetail, CheckDetails, retry } = require('./mongoDB.js');
 const { setTimeout } = require('node:timers/promises')
 
+const proxies = [
+  'http://91.148.134.48:80',
+  'http://44.195.247.145:80',
+  'http://93.93.246.209:8080'
+]
+
 async function ScrapeCastorama (link,categoryId) {
+  const proxy = proxies[Math.floor(Math.random()*proxies.length)];
+  const proxyUrl = await ProxyChain.anonymizeProxy(proxy);
+
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox',`--proxy-server=${proxyUrl}`]
     });   //({ headless : false }) - pokazuje nam  ze otwiera przegladarke
     const page = await browser.newPage();
 
@@ -83,14 +93,14 @@ async function ScrapeCastorama (link,categoryId) {
 
     productInfo.push(...ProductList);
 
-    await Promise.all(ProductList.map( async(data) => {
-      const shopProductId = await upsertShopProduct(data.product);
-      await savePrice({
-        price: data.price.price,
-        shopProductId: shopProductId,
-        createdAt: data.price.createdAt
-      });
-    }))
+    // await Promise.all(ProductList.map( async(data) => {
+    //   const shopProductId = await upsertShopProduct(data.product);
+    //   await savePrice({
+    //     price: data.price.price,
+    //     shopProductId: shopProductId,
+    //     createdAt: data.price.createdAt
+    //   });
+    // }))
   
     const Shop = await page.evaluate(() => {
       const Shop = [];
@@ -101,9 +111,9 @@ async function ScrapeCastorama (link,categoryId) {
 
     // await CheckMongoDB(ProductList, 'ShopProduct');
     // console.log(ProductList);
-    await SaveProduct(ProductNameList, 'Products');
+    // await SaveProduct(ProductNameList, 'Products');
     console.log(ProductNameList);
-    await SaveName(Shop, 'Shops');
+    // await SaveName(Shop, 'Shops');
     console.log(Shop); 
 
     for (const productDesc of ProductList){
@@ -132,7 +142,7 @@ async function ScrapeCastorama (link,categoryId) {
       await saveDetail([shopProductDetails], 'ShopProduct')
       scrapperCount++;
       console.log(shopProductDetails);
-      await randomDelay(24000, 120000);
+      await randomDelay(4000, 12000);
  }} else {
   scrapperCount++;
   console.log(`Details exists for ${sourceId}...`)
@@ -141,8 +151,9 @@ async function ScrapeCastorama (link,categoryId) {
 
     currentPage++;
     
-    await randomDelay(24000, 120000);
+    await randomDelay(4000, 12000);
   }
+    await ProxyChain.closeAnonymizedProxy(proxyUrl); 
     await browser.close();
 
     return scrapperCount;
