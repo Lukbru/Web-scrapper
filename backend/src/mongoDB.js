@@ -250,7 +250,7 @@ async function retry (url, retrycount) {
       throw error
     }
     console.log(`Retrying... ${retrycount}`); 
-    await randomDelay(16000, 46000);
+    await randomDelay(78000, 150000);
     return await retry(url, retrycount-1);
   }
 }
