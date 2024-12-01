@@ -107,7 +107,7 @@ process.on('SIGINT', exitHandler.bind(null, {exit:true}));
 process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));
 process.on('uncaughtException', exitHandler.bind(null, {exit:true}));
 
-cron.schedule('45 18 * * *', async () => {
+cron.schedule('10 12 * * *', async () => {
     startScrapper();
 });
 
