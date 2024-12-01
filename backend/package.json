@@ -16,6 +16,7 @@
     "class-validator": "^0.14.1",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "fs": "^0.0.1-security",
     "mongoose": "^8.6.2",
     "node-cron": "^3.0.3",
     "proxy-chain": "^2.5.5",
