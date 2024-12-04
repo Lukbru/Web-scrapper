@@ -51,7 +51,7 @@ async function ScrapeObi(link, categoryId) {
         const TitleName = ShopProduct.querySelector('.description');
         const name = TitleName ? TitleName.innerText.trim() : '-';
 
-        const PriceName = ShopProduct.querySelector('.price');
+        const PriceName = ShopProduct.querySelector('.new-price');
         let priceString = PriceName ? PriceName.innerText.trim() : '-';
 
         ProductNameList.push({ name, categoryId });
@@ -136,7 +136,7 @@ async function ScrapeObi(link, categoryId) {
     })
 
     if (hasNextPage) {
-      await randomDelay(15000, 30000);
+      await randomDelay(15000, 24000);
     }
   }
 
@@ -167,7 +167,7 @@ async function ScrapeObi(link, categoryId) {
     const shopProductDetails = { shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
     await saveDetail([shopProductDetails], 'ShopProduct')
     console.log(shopProductDetails);
-    await randomDelay(15000, 30000);
+    await randomDelay(15000, 24000);
 
   }
 
