@@ -123,11 +123,13 @@ async function ScrapeObi(link, categoryId) {
       const nextPageButton = document.querySelector('button.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
       if (nextPageButton) {
         nextPageButton.click();
+        console.log('Clicked Button to next page B.')
         return true;
       } 
       const nextPageLink = document.querySelector('a.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
       if (nextPageLink) {
         nextPageLink.click();
+        console.log('Clicked Button to next page A.')
         return true;
       } 
       else {
@@ -136,6 +138,7 @@ async function ScrapeObi(link, categoryId) {
     })
 
     if (hasNextPage) {
+      console.log('HasNextPage is true !!!')
       await randomDelay(15000, 24000);
     }
   }
