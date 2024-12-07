@@ -1,6 +1,19 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 const { saveToMongoDB, CheckMongoDB, sleep, SaveName, saveToCollection, savePrice, upsertShopProduct, SaveProduct, findShopByName, randomDelay, saveDetail, CheckDetails, retry } = require('./mongoDB.js');
 const { setTimeout } = require('node:timers/promises')
+
+async function saveCookies(page){
+  const cookies = await page.cookies();
+  fs.writeFileSync('cookies.json',JSON.stringify(cookies,null,2));
+}
+
+async function loadCookies(page) {
+  if (fs.existsSync('cookies.json')){
+    const cookies = JSON.parse(fs.readFileSync('cookies.json','utf8'));
+    await page.setCookie(...cookies);
+  }
+}
 
 async function ScrapeObi(link, categoryId) {
   const browser = await puppeteer.launch({
@@ -11,6 +24,8 @@ async function ScrapeObi(link, categoryId) {
   await page.evaluateOnNewDocument(() => {
     Object.defineProperty(navigator, 'webdriver', { get: () => false });
 });
+
+await loadCookies(page);
 
   page.setExtraHTTPHeaders({
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:126.0) Gecko/20100101 Firefox/126.0'
@@ -118,6 +133,8 @@ async function ScrapeObi(link, categoryId) {
     await sleep(8000);
     await SaveName(Shop, 'Shops');
     console.log(Shop); 
+
+    await saveCookies(page);
 
     hasNextPage = await page.evaluate(() => {
       const nextPageButton = document.querySelector('button.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
