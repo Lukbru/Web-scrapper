@@ -139,20 +139,26 @@ await loadCookies(page);
     hasNextPage = await page.evaluate(() => {
       const nextPageButton = document.querySelector('button.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
       if (nextPageButton) {
+        console.log ('There is next Button 1 !!!')
         nextPageButton.click();
+        console.log ('It was clicked !!!!!!')
         return true;
       } 
       const nextPageLink = document.querySelector('a.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
       if (nextPageLink) {
+        console.log ('There is next Button 2 !!!')
         nextPageLink.click();
+        console.log ('It was clicked !!!!!!')
         return true;
       } 
       else {
+        console.log ('No more pages :]')
         return false;
       }
     })
 
     if (hasNextPage) {
+      console.log ('There is next page !!!')
       await randomDelay(15000, 24000);
     }
   }
