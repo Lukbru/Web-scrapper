@@ -57,6 +57,8 @@ async function ScrapeCastorama (link,categoryId) {
 
     if (noResult) {
       hasNextPage = false;
+    } else if (currentPage >= 120 ){
+      hasNextPage = false;
     }
 
     const {ProductList, ProductNameList} = await page.evaluate(function (shopId, createdAt,categoryId) { //for Each product -> pętla czy istnieje jesśli nie to...
