@@ -151,7 +151,7 @@ async function ScrapeCastorama (link,categoryId) {
       await saveDetail([shopProductDetails], 'ShopProduct')
       scrapperCount++;
       console.log(shopProductDetails);
-      await randomDelay(14000, 22000);
+      await randomDelay(7000, 15000);
  }} else {
   scrapperCount++;
   console.log(`Details exists for ${sourceId}...`)
@@ -160,7 +160,7 @@ async function ScrapeCastorama (link,categoryId) {
 
     currentPage++;
     
-    await randomDelay(14000, 22000);
+    await randomDelay(7000, 15000);
   }
     await browser.close();
 

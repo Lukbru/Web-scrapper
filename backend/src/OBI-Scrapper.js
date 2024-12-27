@@ -139,16 +139,12 @@ await loadCookies(page);
     hasNextPage = await page.evaluate(() => {
       const nextPageButton = document.querySelector('button.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
       if (nextPageButton) {
-        console.log ('There is next Button 1 !!!')
         nextPageButton.click();
-        console.log ('It was clicked !!!!!!')
         return true;
       } 
       const nextPageLink = document.querySelector('a.pagination-bar__btn[data-ui-name="content.pagination.next-page.link"]:not(.disabled)');
       if (nextPageLink) {
-        console.log ('There is next Button 2 !!!')
         nextPageLink.click();
-        console.log ('It was clicked !!!!!!')
         return true;
       } 
       else {
@@ -159,7 +155,7 @@ await loadCookies(page);
 
     if (hasNextPage) {
       console.log ('There is next page !!!')
-      await randomDelay(15000, 24000);
+      await randomDelay(7000, 18000);
     }
   }
 
@@ -176,8 +172,7 @@ await loadCookies(page);
       console.log(`Details exists for ${sourceId}...`)
       continue;
     }
-
-    await page.goto(productLink);
+    await retry(() => page.goto(productLink),12);
     const description = await page.evaluate(() => {
       const descriptionA = document.querySelector('.overview__detail-list.normal.black')
       details = descriptionA ? descriptionA.innerText.trim().replace(/\n/g, ' ') : null;
@@ -190,7 +185,7 @@ await loadCookies(page);
     const shopProductDetails = { shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
     await saveDetail([shopProductDetails], 'ShopProduct')
     console.log(shopProductDetails);
-    await randomDelay(15000, 24000);
+    await randomDelay(7000, 18000);
 
   }
 
