@@ -65,9 +65,16 @@ await loadCookies(page);
 
         const TitleName = ShopProduct.querySelector('.description');
         const name = TitleName ? TitleName.innerText.trim() : '-';
+       
+        const DiscountedPriceName = ShopProduct.querySelector('.red.big-font.mb-10.tw-font-bold');
+        let priceString = '-';
 
-        const PriceName = ShopProduct.querySelector('.new-price');
-        let priceString = PriceName ? PriceName.innerText.trim() : '-';
+        if (DiscountedPriceName) {
+          priceString = DiscountedPriceName ? DiscountedPriceName.innerText.trim() : '-';
+        } else {
+          const PriceName = ShopProduct.querySelector('.new-price');
+          priceString = PriceName ? PriceName.innerText.trim() : '-';
+        }
 
         ProductNameList.push({ name, categoryId });
 
@@ -84,6 +91,13 @@ await loadCookies(page);
         if (isPiecesString) {
           priceString = priceString.substr(0, priceString.length - piecesSuffix.length);
         }
+
+         // removes suffix from prices like "80,00 zł / kg."
+         const weightSuffix = " / kg.";
+         const isWeightSuffix = priceString.endsWith(weightSuffix);
+         if (isWeightSuffix) {
+           priceString = priceString.substr(0, priceString.length - piecesSuffix.length);
+         }
 
         // remove suffix from prices like "80,00 zł"
         const currencySuffix = " zł";

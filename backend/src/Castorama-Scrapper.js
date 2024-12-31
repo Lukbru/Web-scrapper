@@ -37,7 +37,7 @@ async function ScrapeCastorama (link,categoryId) {
     let currentPage = 1;
     let productInfo = [];
     let scrapperCount = 0;
-    const createdAt = new Date(); 
+    const createdAt = new Date();
     
   while (hasNextPage){
     const url = `${link}?page=${currentPage}`;
@@ -151,7 +151,7 @@ async function ScrapeCastorama (link,categoryId) {
       await saveDetail([shopProductDetails], 'ShopProduct')
       scrapperCount++;
       console.log(shopProductDetails);
-      await randomDelay(7000, 15000);
+      await randomDelay(7000, 18000);
  }} else {
   scrapperCount++;
   console.log(`Details exists for ${sourceId}...`)
@@ -160,7 +160,7 @@ async function ScrapeCastorama (link,categoryId) {
 
     currentPage++;
     
-    await randomDelay(7000, 15000);
+    await randomDelay(7000, 18000);
   }
     await browser.close();
 
