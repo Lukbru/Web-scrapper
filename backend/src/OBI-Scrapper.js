@@ -32,7 +32,7 @@ await loadCookies(page);
   })
 
   console.log(link)
-  await retry(() => page.goto(link),12);
+  await retry( async () => await page.goto(link, {waitUntil: 'domcontentloaded', timeout: 60000}), 12);
 
   const shop = await findShopByName("OBI");
   const shopId = shop._id.toString();
