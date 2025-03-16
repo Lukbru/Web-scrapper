@@ -7,6 +7,10 @@ const uri = "mongodb+srv://bruzdalukasz1c:evsPCoHvQN7TERdZ@scrap.mez5fky.mongodb
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const Secret_Code = '123'; // Very strong secret key
+
 const {ScrapeObi} = require('./OBI-Scrapper.js')
 const {ScrapeCastorama} = require('./Castorama-Scrapper.js')
 
@@ -32,11 +36,24 @@ client.connect().then(() => {
   const shopProduct_collection = db.collection('ShopProduct');
   const productPrice_collection = db.collection('ShopProductPrice');
   const scrapper_collection = db.collection('Scrapper');
+  const users_collection = db.collection('Users');
 
   const test = client.db('test');
   const logs_collection = test.collection('logs');
 
-  app.get('/logs', async (req, res) => {
+  const authorizationToken = (req, res, next) => {
+    const token = req.header('Authorization');
+    if (!token){
+      return res.status(400).json({error: 'Acces Denaid'})
+    }
+    jwt.verify(token.split(" ")[1], Secret_Code,(error, user)=>{
+      if (error) return res.status(400).json({error: 'Invalid Token'})
+        req.user = user;
+      next();
+    })
+  }
+
+  app.get('/logs',authorizationToken, async (req, res) => {
     const logs = await logs_collection.find().toArray();
     res.json(logs);
   });
@@ -232,7 +249,6 @@ app.post('/Scrapper/Run', async (req, res) => {
   const { scrapper } = req.body
   const scrapperIds = scrapper.map(scrap=> new ObjectId(scrap._id))
   const checkedScrappers = await scrapper_collection.find({ _id: {$in:scrapperIds}}).toArray();
-  // const scrappers = await scrapper_collection.find().toArray(); //TODO Filtr w Find
   const ObiShopId = '6626adc5a5b15d56ea2cb5dc';
   const CastoramaShopId = '66255aee1b80af46d117b52b';
 
@@ -247,36 +263,44 @@ app.post('/Scrapper/Run', async (req, res) => {
   res.json();
 });
 
+app.post('/Register', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username|| !password){
+    return res.status(400).json({error: 'Please fill the information'})
+  }
+  const existing_user = await users_collection.findOne({ username });
+  if (existing_user){
+    return res.status(400).json({error: 'Username already exist'})
+  }
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const newUser = {username, password: hashedPassword};
+  await users_collection.insertOne(newUser);
+  res.status(200).json();
+})
+
+app.post('/Login', async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username|| !password){
+    return res.status(400).json({error: 'Please fill the information'})
+  }
+
+  const user = await users_collection.findOne({ username });
+  if (!user){
+    return res.status(400).json({error: 'Username does not exist'})
+  }
+
+  const isPasswordValid = await bcrypt.compare( password, user.password );
+  if (!isPasswordValid){
+    return res.status(400).json({error: 'Invalid Password or Username'})
+  }
+
+  const token = jwt.sign({ username : user.username, id : user._id}, Secret_Code, { expiresIn: '1h'} );
+  
+  res.json({ token });
+})
+
   app.listen(port, () => {
     console.log('Server running on port: 3000')
   });
 });
-
-
-
-/*
-app.post('/Scrapper/Run', async (req, res) => {
-  const shops = await shops_collection.find().toArray();
-  const shopIdScrapper = [];
-  const shopScrapeMap={
-    'OBI' : ScrapeObi,
-    'Castorama': ScrapeCastorama
-  }
-
-  shops.forEach(shop=>{ if (shopScrapeMap[shop.name]){
-    shopIdScrapper[shop._id.toString()]=shopScrapeMap[shop.name];
-  }});
-
-
-  const scrappers = await scrapper_collection.find().toArray(); //TODO Filtr w Find
-
-
-  for (const scapper of scrappers){
-    const scrapeFunction = shopIdScrapper[scapper.shopId.toString()];
-    if (scrapeFunction){
-      await scrapeFunction(scapper.link, scapper.categoryId);
-    }
-  }
-  res.json();
-});
-*/

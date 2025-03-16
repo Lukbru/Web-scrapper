@@ -11,8 +11,16 @@ function Logs() {
 
 
     const fetchLogs = async () => {
+        const token = localStorage.getItem('token');
+        if (!token){
+            setError('Unauthorized -- Please Login');
+            setLoading(false);
+            return;
+        }
         try {
-            const logsResponse = await axios.get('http://localhost:3000/logs');
+            const logsResponse = await axios.get('http://localhost:3000/logs', {
+                headers: {Authorization : `Bearer ${token}`}
+            });
 
             if (logsResponse.status !== 200) {
                 throw new error('Error - please try again later')

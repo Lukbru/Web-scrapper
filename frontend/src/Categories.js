@@ -52,20 +52,20 @@ function Product() {
         setCategories([...categories, response.data]);
     };
 
-    const ChangeCategory = async (e) => {
-        if (!selectProduct||!selectCategory){
-            setError('Both Category and Product need to be selected');
-            return;
-        } else {
-            const response = await axios.put('http://localhost:3000/productsCategory', {
-            productId: selectProduct,    
-            categoryId: selectCategory});
-            if (response.status !== 200){
-                throw new Error('Error - please in chaning category, please try again later');
-            }
-            setProducts(products.map(Product=>Product._id === selectProduct ? {...Product, categoryId: selectCategory} : Product));
-        }
-    };
+    // const ChangeCategory = async (e) => {
+    //     if (!selectProduct||!selectCategory){
+    //         setError('Both Category and Product need to be selected');
+    //         return;
+    //     } else {
+    //         const response = await axios.put('http://localhost:3000/productsCategory', {
+    //         productId: selectProduct,    
+    //         categoryId: selectCategory});
+    //         if (response.status !== 200){
+    //             throw new Error('Error - in chaning category, please try again later');
+    //         }
+    //         setProducts(products.map(Product=>Product._id === selectProduct ? {...Product, categoryId: selectCategory} : Product));
+    //     }
+    // };
 
     useEffect(() => {
         fetchCategories();

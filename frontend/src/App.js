@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom';
 import Product from './Product';
 import ShopProduct from './ShopProduct';
@@ -7,6 +7,7 @@ import ProductDetail from './ProductDetail';
 import Categories from './Categories';
 import Scrapper from './Scrapper';
 import Logs from './Logs';
+import Login from './Login'
 
 function App() {
   const navbar={
@@ -25,6 +26,7 @@ function App() {
   const menuboxes={
     display: 'inline',
   }
+  const [token, setToken] = useState(localStorage.getItem('token'));
 
   return (
     <Router>
@@ -45,6 +47,9 @@ function App() {
       <li style={menuboxes}>
         <Link to = './' style={linkboxes}>Product</Link>
       </li>
+      <li style={menuboxes}>
+        <Link to = './Login' style={linkboxes}>Login</Link>
+      </li>
       </nav>
 
       ---------------
@@ -63,6 +68,8 @@ function App() {
         <Route path="/Logs" element={<Logs />} />
 
         <Route path="/ConnectProducts/:shopProductId" element={<ConnectProducts />} />
+
+        <Route path="/Login" element={<Login setToken={setToken} />} />
 
         <Route path="/" element={<Product />} />
      

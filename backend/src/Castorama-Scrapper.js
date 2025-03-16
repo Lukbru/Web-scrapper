@@ -118,8 +118,6 @@ async function ScrapeCastorama (link,categoryId) {
 
     await saveCookies(page);
 
-    // await CheckMongoDB(ProductList, 'ShopProduct');
-    // console.log(ProductList);
     await SaveProduct(ProductNameList, 'Products');
     console.log(ProductNameList);
     await SaveName(Shop, 'Shops');
@@ -151,7 +149,7 @@ async function ScrapeCastorama (link,categoryId) {
       await saveDetail([shopProductDetails], 'ShopProduct')
       scrapperCount++;
       console.log(shopProductDetails);
-      await randomDelay(7000, 18000);
+      await randomDelay(7000, 8000);
  }} else {
   scrapperCount++;
   console.log(`Details exists for ${sourceId}...`)
@@ -160,7 +158,7 @@ async function ScrapeCastorama (link,categoryId) {
 
     currentPage++;
     
-    await randomDelay(7000, 18000);
+    await randomDelay(7000, 8000);
   }
     await browser.close();
 

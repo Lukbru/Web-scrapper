@@ -140,8 +140,6 @@ await loadCookies(page);
       return Shop;
     });
 
-    // await CheckMongoDB(ProductList, 'ShopProduct');
-    // console.log(ProductList);
     await SaveProduct(ProductNameList, 'Products');
     console.log(ProductNameList);
     await sleep(8000);
@@ -169,7 +167,7 @@ await loadCookies(page);
 
     if (hasNextPage) {
       console.log ('There is next page !!!')
-      await randomDelay(7000, 18000);
+      await randomDelay(7000, 8000);
     }
   }
 
@@ -199,7 +197,7 @@ await loadCookies(page);
     const shopProductDetails = { shopId, sourceId, description: description.details, imageUrl: description.imageUrl };
     await saveDetail([shopProductDetails], 'ShopProduct')
     console.log(shopProductDetails);
-    await randomDelay(7000, 18000);
+    await randomDelay(7000, 8000);
 
   }
 
